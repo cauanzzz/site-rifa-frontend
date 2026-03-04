@@ -51,13 +51,19 @@ export function Home() {
                   </Link>
                   <Button variant="outline" onClick={() => setLogado(false)}>Sair</Button>
                 </>
-              ) : (
-                <Button 
-                  onClick={() => setLogado(true)} 
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                >
-                  Login
-                </Button>
+              ) : (  
+                <>
+                  <Button variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-50">
+                    Cadastrar-se
+                  </Button>
+                  
+                  <Button 
+                    onClick={() => setLogado(true)} 
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                  >
+                    Login
+                  </Button>
+                </>
               )}
             </div>
 
