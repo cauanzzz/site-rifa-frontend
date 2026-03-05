@@ -9,9 +9,36 @@ import { useState } from 'react';
 
 export function Home() {
   const [logado, setLogado] = useState(false);
+  const [mostrarLogin, setMostrarLogin] = useState(false);
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
   const { raffles } = useRaffles();
   const activeRaffles = raffles.filter(r => r.status === 'active');
 
+const fazerLogin = async () => {
+    try {
+      const resposta = await fetch('https://localhost:7002/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, senha })
+      });
+
+      if (resposta.ok) {
+        const dadosUsuario = await resposta.json();
+        alert(`Bem-vindo(a) ao painel, ${dadosUsuario.nome}! 🚀`);
+        setLogado(true);
+        setMostrarLogin(false);
+      } else {
+        alert('❌ E-mail ou senha incorretos! Tente novamente.');
+      }
+    } catch (erro) {
+      alert('⚠️ Erro de conexão! O seu C# está rodando?');
+      console.error(erro);
+    }
+  };
+  
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -58,7 +85,7 @@ export function Home() {
                   </Button>
                   
                   <Button 
-                    onClick={() => setLogado(true)} 
+                    onClick={() => setMostrarLogin(true)} 
                     className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
                   >
                     Login
@@ -187,6 +214,58 @@ export function Home() {
           </div>
         )}
       </section>
+      {/* === MODAL DE LOGIN FLUTUANTE === */}
+      {mostrarLogin && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
+            
+            {/* Botão de Fechar no canto (X) */}
+            <button 
+              onClick={() => setMostrarLogin(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold"
+            >
+              ✕
+            </button>
+            
+            <h2 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Entrar no RifaMax
+            </h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                <input 
+                  type="email" 
+                  placeholder="seu@email.com"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                <input 
+                  type="password" 
+                  placeholder="••••••••"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                />
+              </div>
+
+              <Button 
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 mt-6"
+                onClick={fazerLogin}
+              >
+                Entrar
+              </Button>
+            </div>
+
+          </div>
+        </div>
+      )}
+      {/* === FIM DO MODAL === */}
     </div>
   );
 }

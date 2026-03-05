@@ -19,12 +19,11 @@ export function RaffleDetail() {
 
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
-  const [buyerName, setBuyerName] = useState('');
-  const [buyerPhone, setBuyerPhone] = useState('');
-  const [buyerEmail, setBuyerEmail] = useState('');
+  const [formaPagamento, setFormaPagamento] = useState('PIX');
+  const [nomePagador, setNomePagador] = useState('');
 
   if (!raffle) {
-    return (
+    return ( 
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-xl text-gray-600 mb-4">Rifa não encontrada</p>
@@ -53,27 +52,26 @@ export function RaffleDetail() {
     );
   };
 
-  const handlePurchase = () => {
-    if (!buyerName || !buyerPhone || !buyerEmail) {
-      toast.error('Preencha todos os campos');
+ const handlePurchase = () => {
+    if (!nomePagador) {
+      toast.error('Por favor, informe o nome de quem fez o pagamento');
       return;
     }
 
     purchaseNumbers({
       raffleId: raffle.id,
       numbers: selectedNumbers,
-      buyerName,
-      buyerPhone,
-      buyerEmail,
+      buyerName: nomePagador,
+      buyerPhone: formaPagamento, 
+      buyerEmail: 'usuario@logado.com',
       totalAmount: selectedNumbers.length * raffle.price
     });
 
     toast.success(`Parabéns! Você adquiriu ${selectedNumbers.length} número(s)!`);
     setShowPurchaseDialog(false);
     setSelectedNumbers([]);
-    setBuyerName('');
-    setBuyerPhone('');
-    setBuyerEmail('');
+    setNomePagador('');
+    setFormaPagamento('PIX');
   };
 
   const progress = (raffle.soldNumbers.length / raffle.totalNumbers) * 100;
@@ -277,41 +275,39 @@ export function RaffleDetail() {
           </DialogHeader>
 
           <div className="space-y-4 py-4">
+            {/* MANTEMOS A CAIXINHA DO TOTAL A PAGAR */}
             <div className="bg-purple-50 p-4 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Total a pagar:</p>
               <p className="text-2xl font-bold text-purple-600">{formatCurrency(totalAmount)}</p>
               <p className="text-xs text-gray-500 mt-1">{selectedNumbers.length} número(s) selecionado(s)</p>
             </div>
 
+            {/* NOVOS CAMPOS DE PAGAMENTO */}
             <div className="space-y-2">
-              <Label htmlFor="name">Nome Completo</Label>
-              <Input 
-                id="name"
-                placeholder="Seu nome completo"
-                value={buyerName}
-                onChange={(e) => setBuyerName(e.target.value)}
-              />
+              <Label htmlFor="pagamento">Forma de Pagamento</Label>
+              <select 
+                id="pagamento"
+                className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-600 focus-visible:ring-offset-2"
+                value={formaPagamento}
+                onChange={(e) => setFormaPagamento(e.target.value)}
+              >
+                <option value="PIX">PIX</option>
+                <option value="Cartão">Cartão de Crédito</option>
+                <option value="Transferência">Transferência Bancária</option>
+              </select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Telefone</Label>
+              <Label htmlFor="nomePagador">Nome de quem fez o pagamento</Label>
               <Input 
-                id="phone"
-                placeholder="(00) 00000-0000"
-                value={buyerPhone}
-                onChange={(e) => setBuyerPhone(e.target.value)}
+                id="nomePagador"
+                placeholder="Ex: Cauan Silva (Nome no comprovante)"
+                value={nomePagador}
+                onChange={(e) => setNomePagador(e.target.value)}
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
-              <Input 
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={buyerEmail}
-                onChange={(e) => setBuyerEmail(e.target.value)}
-              />
+              <p className="text-xs text-gray-500 mt-1">
+                Informe o nome do titular da conta que enviou o dinheiro para agilizarmos a liberação.
+              </p>
             </div>
           </div>
 
