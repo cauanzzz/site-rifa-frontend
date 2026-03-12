@@ -118,9 +118,11 @@ const fazerLogin = async () => {
             <div className="flex items-center gap-4">
               {logado ? (
                 <>
-                  <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
-                    Minhas Rifas
-                  </Button>
+                  <Link to="/minhas-rifas">
+                 <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                Minhas Rifas
+                </Button>
+                </Link>
                   <Link to="/criar-rifa">
                     <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
                       Criar Rifa

@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router';
 import { Home } from './pages/Home';
 import { RaffleDetail } from './pages/RaffleDetail';
 import { CreateRaffle } from './pages/CreateRaffle';
+import { MyRaffles } from './pages/MyRaffles'; // 
 
 export const router = createBrowserRouter([
   {
@@ -15,6 +16,10 @@ export const router = createBrowserRouter([
   {
     path: '/criar-rifa',
     Component: CreateRaffle,
+  },
+  {
+    path: '/minhas-rifas', 
+    Component: MyRaffles,
   },
   {
     path: '*',
