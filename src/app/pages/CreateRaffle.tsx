@@ -21,11 +21,11 @@ export function CreateRaffle() {
   const [totalNumbers, setTotalNumbers] = useState('');
   const [drawDate, setDrawDate] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || !description || !prize || !price || !totalNumbers || !drawDate) {
-      toast.error('Preencha todos os campos obrigatórios');
+    if (!title || !price || !totalNumbers) {
+      toast.error('Preencha os campos obrigatórios: Título, Preço e Quantidade de Números');
       return;
     }
 
@@ -37,19 +37,31 @@ export function CreateRaffle() {
       return;
     }
 
-    addRaffle({
-      title,
-      description,
-      prize,
-      imageUrl: imageUrl || 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=800&q=80',
-      price: priceNum,
-      totalNumbers: totalNum,
-      status: 'active',
-      drawDate: new Date(drawDate).toISOString()
-    });
+    try {
+      const resposta = await fetch('https://localhost:7002/api/rifa', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          Titulo: title, 
+          Preço: priceNum, 
+          QuantidadeCotas: totalNum
+        })
+      });
 
-    toast.success('Rifa criada com sucesso!');
-    navigate('/');
+      if (resposta.ok) {
+        toast.success('Rifa criada com sucesso no Banco de Dados! 🎉');
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
+      } else {
+        toast.error('Erro ao salvar a rifa no servidor.');
+      }
+    } catch (erro) {
+      toast.error('⚠️ Erro de conexão! O C# está rodando?');
+      console.error(erro);
+    }
   };
 
   return (
