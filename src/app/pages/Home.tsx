@@ -9,12 +9,23 @@ import { useState, useEffect } from 'react';
 
 export function Home() {
   const [logado, setLogado] = useState(false);
+  const [usuarioNome, setUsuarioNome] = useState(''); 
+  const [moedas, setMoedas] = useState(0); 
+
   const [mostrarLogin, setMostrarLogin] = useState(false);
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [activeRaffles, setActiveRaffles] = useState<any[]>([]);
 
   useEffect(() => {
+    const usuarioSalvo = localStorage.getItem('usuario');
+    if (usuarioSalvo) {
+      const dados = JSON.parse(usuarioSalvo);
+      setLogado(true);
+      setUsuarioNome(dados.nome);
+      setMoedas(dados.moedas || 0); 
+    }
+
     const buscarRifas = async () => {
       try {
         const resposta = await fetch('https://localhost:7002/api/rifa');
@@ -29,28 +40,35 @@ export function Home() {
 
     buscarRifas();
   }, []);
+
   const [mostrarCadastro, setMostrarCadastro] = useState(false);
   const [nomeCadastro, setNomeCadastro] = useState('');
   const [emailCadastro, setEmailCadastro] = useState('');
   const [senhaCadastro, setSenhaCadastro] = useState('');
 
-const fazerLogin = async () => {
+  const fazerLogin = async () => {
     try {
       const resposta = await fetch('https://localhost:7002/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha })
       });
 
       if (resposta.ok) {
         const dadosUsuario = await resposta.json();
-        alert(`Bem-vindo(a) ao painel, ${dadosUsuario.nome}! 🚀`);
+        
+        localStorage.setItem('usuario', JSON.stringify(dadosUsuario));
+        
+        alert(`Bem-vindo(a) de volta, ${dadosUsuario.nome}! 🚀 Você tem ${dadosUsuario.moedas} moedas.`);
+        setUsuarioNome(dadosUsuario.nome);
+        setMoedas(dadosUsuario.moedas); 
         setLogado(true);
         setMostrarLogin(false);
+        setEmail('');
+        setSenha('');
       } else {
-        alert('❌ E-mail ou senha incorretos! Tente novamente.');
+        const erro = await resposta.text();
+        alert(`❌ ${erro || 'E-mail ou senha incorretos!'}`);
       }
     } catch (erro) {
       alert('⚠️ Erro de conexão! O seu C# está rodando?');
@@ -60,11 +78,9 @@ const fazerLogin = async () => {
 
   const fazerCadastro = async () => {
     try {
-      const resposta = await fetch('https://localhost:7002/api/auth/registrar', {
+      const resposta = await fetch('https://localhost:7002/api/auth/cadastro', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           nome: nomeCadastro, 
           email: emailCadastro, 
@@ -72,35 +88,40 @@ const fazerLogin = async () => {
         })
       });
 
-      const dados = await resposta.json();
-
       if (resposta.ok) {
-        alert('🎉 ' + dados.mensagem);
+        alert('🎉 Conta criada com sucesso! Você ganhou 50 moedas de brinde. Agora faça o login.');
         setMostrarCadastro(false);
         setMostrarLogin(true);
       } else {
-        alert('❌ ' + dados.mensagem);
+        const erro = await resposta.text();
+        alert(`❌ Erro: ${erro}`);
       }
     } catch (erro) {
       alert('⚠️ Erro de conexão! O seu C# está rodando?');
       console.error(erro);
     }
   };
+
+  const fazerLogout = () => {
+    localStorage.removeItem('usuario'); 
+    setLogado(false);
+    setUsuarioNome('');
+    setMoedas(0); 
+  };
   
   const formatDate = (dateString: string) => {
-    if (!dateString) return 'A definir'; // Proteção contra data vazia
+    if (!dateString) return 'A definir';
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
   const formatCurrency = (value: number) => {
-    if (value === undefined || value === null) return 'R$ 0,00'; // Proteção contra preço vazio
+    if (value === undefined || value === null) return 'R$ 0,00';
     return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-     {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
@@ -110,25 +131,33 @@ const fazerLogin = async () => {
               </div>
               <div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                  RifaMax
+                  RIFEX
                 </h1>
                 <p className="text-sm text-gray-600">Concorra a prêmios incríveis</p>
               </div>
             </div>
+            
             <div className="flex items-center gap-4">
               {logado ? (
                 <>
+                  <div className="flex items-center gap-2 mr-2">
+                    <span className="text-sm font-medium text-gray-700">Olá, {usuarioNome}</span>
+                    {/* === AQUI ESTÁ A NOSSA CAIXINHA ESTILOSA DE MOEDAS! === */}
+                    <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border border-yellow-300 shadow-sm flex items-center gap-1 px-3 py-1">
+                      🪙 {moedas}
+                    </Badge>
+                  </div>
                   <Link to="/minhas-rifas">
-                 <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
-                Minhas Rifas
-                </Button>
-                </Link>
+                    <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                      Minhas Rifas
+                    </Button>
+                  </Link>
                   <Link to="/criar-rifa">
                     <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
                       Criar Rifa
                     </Button>
                   </Link>
-                  <Button variant="outline" onClick={() => setLogado(false)}>Sair</Button>
+                  <Button variant="outline" onClick={fazerLogout}>Sair</Button>
                 </>
               ) : (  
                 <>
@@ -181,7 +210,6 @@ const fazerLogin = async () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">
-                  {/* Puxando o nome correto do banco: quantidadeCotas */}
                   {activeRaffles.reduce((sum, r) => sum + (r.quantidadeCotas || 0), 0)}
                 </p>
                 <p className="text-sm text-gray-600">Números Disponíveis</p>
@@ -205,16 +233,13 @@ const fazerLogin = async () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {activeRaffles && activeRaffles.map((raffle) => {
             
-            // === A NOSSA TRADUÇÃO DO C# PARA O REACT ===
             const titulo = raffle.titulo || 'Rifa Sem Título';
             const preco = raffle.preço || 0;
             const quantidadeTotal = raffle.quantidadeCotas || 1;
             
-            // Calcula quantas cotas já foram vendidas (Status diferente de "Disponivel")
             const cotasVendidas = raffle.cotas ? raffle.cotas.filter((c: any) => c.status !== 'Disponivel').length : 0;
             const progress = (cotasVendidas / quantidadeTotal) * 100;
 
-            // Imagem provisória padrão, já que o C# ainda não tem coluna de foto
             const imagemPadrao = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=500&q=80";
 
             return (
@@ -277,46 +302,37 @@ const fazerLogin = async () => {
           </div>
         )}
       </section>
-      {/* === MODAL DE LOGIN FLUTUANTE === */}
+      
+      {/* Modal de Login */}
       {mostrarLogin && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
-            
-            {/* Botão de Fechar no canto (X) */}
             <button 
               onClick={() => setMostrarLogin(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold"
             >
               ✕
             </button>
-            
             <h2 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Entrar no RifaMax
+              Entrar no RIFEX
             </h2>
-            
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
                 <input 
-                  type="email" 
-                  placeholder="seu@email.com"
+                  type="email" placeholder="seu@email.com"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={email} onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
                 <input 
-                  type="password" 
-                  placeholder="••••••••"
+                  type="password" placeholder="••••••••"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
+                  value={senha} onChange={(e) => setSenha(e.target.value)}
                 />
               </div>
-
               <Button 
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 mt-6"
                 onClick={fazerLogin}
@@ -324,12 +340,11 @@ const fazerLogin = async () => {
                 Entrar
               </Button>
             </div>
-
           </div>
         </div>
       )}
-      {/* === FIM DO MODAL === */}
-      {/* === MODAL DE CADASTRO === */}
+
+      {/* Modal de Cadastro */}
       {mostrarCadastro && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">

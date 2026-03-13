@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { useRaffles } from '../context/RaffleContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -11,7 +10,9 @@ import { toast } from 'sonner';
 
 export function CreateRaffle() {
   const navigate = useNavigate();
-  const { addRaffle } = useRaffles();
+  
+  // 1. Memória para guardar quem é o dono que está criando a rifa
+  const [usuarioLogado, setUsuarioLogado] = useState<any>(null);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -20,6 +21,16 @@ export function CreateRaffle() {
   const [price, setPrice] = useState('');
   const [totalNumbers, setTotalNumbers] = useState('');
   const [drawDate, setDrawDate] = useState('');
+
+  useEffect(() => {
+    const usuarioSalvo = localStorage.getItem('usuario');
+    if (usuarioSalvo) {
+      setUsuarioLogado(JSON.parse(usuarioSalvo));
+    } else {
+      toast.error('Você precisa estar logado para criar uma rifa!');
+      navigate('/'); 
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +57,8 @@ export function CreateRaffle() {
         body: JSON.stringify({ 
           Titulo: title, 
           Preço: priceNum, 
-          QuantidadeCotas: totalNum
+          QuantidadeCotas: totalNum,
+          CriadorEmail: usuarioLogado.email 
         })
       });
 
@@ -84,11 +96,20 @@ export function CreateRaffle() {
           <CardHeader>
             <CardTitle className="text-3xl">Criar Nova Rifa</CardTitle>
             <CardDescription>
-              Preencha os dados abaixo para criar uma nova rifa
+              Preencha os dados abaixo para criar uma nova rifa vinculada à sua conta
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              
+              {/* Avisando o usuário que a rifa será dele */}
+              {usuarioLogado && (
+                <div className="bg-purple-50 border border-purple-200 text-purple-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+                  <span className="font-semibold">Criador da Rifa:</span> 
+                  {usuarioLogado.nome} ({usuarioLogado.email})
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="title">Título da Rifa *</Label>
                 <Input 
@@ -193,9 +214,9 @@ export function CreateRaffle() {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-semibold text-blue-900 mb-2">Informações Importantes</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Certifique-se de que todos os dados estão corretos antes de criar</li>
-                  <li>• A rifa será publicada imediatamente após a criação</li>
-                  <li>• Os participantes poderão começar a comprar números assim que a rifa for criada</li>
+                  <li>• Você poderá aprovar os pagamentos no seu Painel de Controle.</li>
+                  <li>• A rifa será publicada imediatamente após a criação.</li>
+                  <li>• Certifique-se de que os dados estão corretos.</li>
                 </ul>
               </div>
 

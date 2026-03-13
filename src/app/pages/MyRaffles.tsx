@@ -8,12 +8,22 @@ import { toast } from 'sonner';
 
 export function MyRaffles() {
   const navigate = useNavigate();
-  const [abaAtiva, setAbaAtiva] = useState<'compradas' | 'criadas'>('criadas'); 
+  const [abaAtiva, setAbaAtiva] = useState<'compradas' | 'criadas'>('compradas'); 
   
   const [rifas, setRifas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [usuarioLogado, setUsuarioLogado] = useState<any>(null);
 
   useEffect(() => {
+    const usuarioSalvo = localStorage.getItem('usuario');
+    if (usuarioSalvo) {
+      setUsuarioLogado(JSON.parse(usuarioSalvo));
+    } else {
+      toast.error("Você precisa estar logado para acessar o painel!");
+      navigate('/');
+      return;
+    }
+
     const buscarDados = async () => {
       try {
         const resposta = await fetch('https://localhost:7002/api/rifa');
@@ -22,15 +32,15 @@ export function MyRaffles() {
           setRifas(dados);
         }
       } catch (erro) {
-        console.error(erro);
         toast.error('Erro ao conectar com o banco de dados.');
       } finally {
         setLoading(false);
       }
     };
     buscarDados();
-  }, []);
+  }, [navigate]);
 
+  // === BOTÃO VERDE: APROVAR ===
   const aprovarPagamento = async (rifaId: number, numero: number) => {
     try {
       const resposta = await fetch('https://localhost:7002/api/rifa/aprovar', {
@@ -43,25 +53,51 @@ export function MyRaffles() {
         toast.success(`Pagamento do número ${numero} aprovado com sucesso! ✅`);
         setTimeout(() => window.location.reload(), 1500);
       } else {
-        toast.error('Erro ao aprovar o pagamento no servidor.');
+        toast.error('Erro ao aprovar.');
       }
     } catch (erro) {
-      console.error(erro);
       toast.error('⚠️ Erro de conexão com o C#.');
     }
   };
 
-  const formatCurrency = (value: number) => {
-    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  // === BOTÃO VERMELHO: RECUSAR ===
+  const rejeitarPagamento = async (rifaId: number, numero: number) => {
+    if (!window.confirm("Tem certeza que deseja cancelar esta reserva? O número voltará a ficar disponível para todos.")) return;
+    
+    try {
+      const resposta = await fetch('https://localhost:7002/api/rifa/rejeitar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ RifaId: rifaId, Numero: numero })
+      });
+
+      if (resposta.ok) {
+        toast.success(`Reserva do número ${numero} recusada! ❌`);
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        toast.error('Erro ao cancelar a reserva.');
+      }
+    } catch (erro) {
+      toast.error('⚠️ Erro de conexão com o C#.');
+    }
   };
+
+  const formatCurrency = (value: number) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  // Filtra compras usando o RG INVISÍVEL (E-mail do Comprador)
+  const minhasRifasCompradas = rifas.filter(r => 
+    r.cotas && r.cotas.some((c: any) => c.compradorEmail === usuarioLogado?.email)
+  );
+
+  // Filtra as rifas criadas pelo RG INVISÍVEL (E-mail do Criador)
+  const minhasRifasCriadas = rifas.filter(r => r.criadorEmail === usuarioLogado?.email);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
       <header className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <Button variant="ghost" onClick={() => navigate('/')} className="gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
+            <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
         </div>
       </header>
@@ -90,76 +126,112 @@ export function MyRaffles() {
           <p className="text-gray-600">Buscando dados no banco...</p>
         ) : (
           <>
+            {/* === ABA 1: COMPRAS === */}
             {abaAtiva === 'compradas' && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Minhas Reservas</h2>
-                <div className="bg-white p-8 rounded-xl border border-gray-100 text-center shadow-sm">
-                  <Ticket className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">Em breve conectaremos o login para mostrar suas compras aqui.</p>
-                </div>
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold mb-4">Minhas Compras e Reservas</h2>
+                
+                {minhasRifasCompradas.length === 0 ? (
+                  <div className="bg-white p-8 rounded-xl border border-gray-100 text-center shadow-sm">
+                    <Ticket className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500 font-medium">Você ainda não comprou nenhuma cota nova.</p>
+                  </div>
+                ) : (
+                  minhasRifasCompradas.map(rifa => {
+                    const minhasCotas = rifa.cotas.filter((c: any) => c.compradorEmail === usuarioLogado?.email);
+                    
+                    return (
+                      <Card key={rifa.id} className="border-l-4 border-l-purple-500">
+                        <CardContent className="p-6">
+                          <h3 className="font-bold text-lg mb-4 pb-4 border-b">{rifa.titulo}</h3>
+                          <div className="flex flex-wrap gap-3">
+                            {minhasCotas.map((cota: any) => (
+                              <div key={cota.numero} className={`flex flex-col items-center p-3 rounded-lg border min-w-[100px] ${cota.status === 'Vendido' ? 'bg-gray-50 border-gray-200' : 'bg-yellow-50 border-yellow-200'}`}>
+                                <span className={`font-bold text-xl ${cota.status === 'Vendido' ? 'text-gray-700' : 'text-yellow-700'}`}>{cota.numero.toString().padStart(4, '0')}</span>
+                                <span className={`text-[10px] mt-1 px-2 py-0.5 rounded-full font-semibold uppercase ${cota.status === 'Vendido' ? 'bg-green-100 text-green-700' : 'bg-yellow-200 text-yellow-800'}`}>
+                                  {cota.status === 'Vendido' ? 'Aprovado' : 'Aguardando'}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })
+                )}
               </div>
             )}
 
+            {/* === ABA 2: CRIADAS (ADMIN) === */}
             {abaAtiva === 'criadas' && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold">Aprovação de Pagamentos</h2>
-                  <Badge className="bg-yellow-500">Aguardando Aprovação</Badge>
+                  <Badge className="bg-yellow-500">Minhas Rifas</Badge>
                 </div>
 
-                {rifas.map(rifa => {
-                  const cotasReservadas = rifa.cotas ? rifa.cotas.filter((c: any) => c.status === 'Reservado') : [];
-                  
-                  if (cotasReservadas.length === 0) return null; 
+                {minhasRifasCriadas.length === 0 ? (
+                  <div className="bg-white p-8 rounded-xl border border-gray-100 text-center shadow-sm">
+                    <Ticket className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500 font-medium">Você ainda não criou nenhuma rifa no seu nome.</p>
+                  </div>
+                ) : (
+                  minhasRifasCriadas.map(rifa => {
+                    const cotasReservadas = rifa.cotas ? rifa.cotas.filter((c: any) => c.status === 'Reservado') : [];
+                    if (cotasReservadas.length === 0) return null;
 
-                  return (
-                    <Card key={rifa.id} className="border-l-4 border-l-yellow-400">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-center mb-4 pb-4 border-b">
-                          <div>
-                            <h3 className="font-bold text-lg">{rifa.titulo}</h3>
-                            <p className="text-sm text-gray-500">Preço da cota: {formatCurrency(rifa.preço)}</p>
+                    return (
+                      <Card key={rifa.id} className="border-l-4 border-l-yellow-400">
+                        <CardContent className="p-6">
+                          <div className="flex justify-between items-center mb-4 pb-4 border-b">
+                            <div>
+                              <h3 className="font-bold text-lg">{rifa.titulo}</h3>
+                              <p className="text-sm text-gray-500">Preço da cota: {formatCurrency(rifa.preço)}</p>
+                            </div>
                           </div>
-                        </div>
 
-                        <div className="space-y-4">
-                          {cotasReservadas.map((cota: any) => (
-                            <div key={cota.numero} className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 p-4 rounded-lg border border-gray-100">
-                              <div className="flex items-center gap-4 mb-3 sm:mb-0">
-                                <div className="bg-yellow-100 text-yellow-700 font-bold px-4 py-2 rounded-lg text-center min-w-[60px]">
-                                  {cota.numero.toString().padStart(4, '0')}
-                                </div>
-                                <div>
-                                  <p className="font-semibold text-gray-900">{cota.nome}</p>
-                                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                                    <Clock className="w-3 h-3" />
-                                    <span>Pagamento via: <strong>{cota.tel}</strong></span>
+                          <div className="space-y-4">
+                            {cotasReservadas.map((cota: any) => (
+                              <div key={cota.numero} className="flex flex-col md:flex-row md:items-center justify-between bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                <div className="flex items-center gap-4 mb-4 md:mb-0">
+                                  <div className="bg-yellow-100 text-yellow-700 font-bold px-4 py-2 rounded-lg text-center min-w-[60px]">
+                                    {cota.numero.toString().padStart(4, '0')}
+                                  </div>
+                                  <div>
+                                    {/* Mostra o nome que a pessoa digitou + o email da conta dela */}
+                                    <p className="font-semibold text-gray-900">{cota.nome}</p>
+                                    <p className="text-xs text-gray-500">Conta: {cota.compradorEmail}</p>
+                                    <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
+                                      <Clock className="w-3 h-3" />
+                                      <span>Pagamento via: <strong>{cota.tel}</strong></span>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              
-                              <Button 
-                                onClick={() => aprovarPagamento(rifa.id, cota.numero)}
-                                className="bg-green-600 hover:bg-green-700 text-white gap-2"
-                              >
-                                <CheckCircle className="w-4 h-4" />
-                                Aprovar Pagamento
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+                                
+                                {/* === OS DOIS BOTÕES AQUI === */}
+                                <div className="flex gap-2 w-full md:w-auto">
+                                  <Button 
+                                    onClick={() => rejeitarPagamento(rifa.id, cota.numero)} 
+                                    variant="outline" 
+                                    className="text-red-600 border-red-200 hover:bg-red-50 flex-1 md:flex-none"
+                                  >
+                                    Recusar
+                                  </Button>
+                                  <Button 
+                                    onClick={() => aprovarPagamento(rifa.id, cota.numero)} 
+                                    className="bg-green-600 hover:bg-green-700 text-white gap-2 flex-1 md:flex-none"
+                                  >
+                                    <CheckCircle className="w-4 h-4" /> Aprovar
+                                  </Button>
+                                </div>
 
-                {/* Mensagem caso não tenha ninguém aguardando aprovação */}
-                {!rifas.some(r => r.cotas && r.cotas.some((c: any) => c.status === 'Reservado')) && (
-                  <div className="bg-white p-8 rounded-xl border border-gray-100 text-center shadow-sm">
-                    <CheckCircle className="w-12 h-12 text-green-300 mx-auto mb-3" />
-                    <p className="text-gray-500 font-medium">Tudo em dia!</p>
-                    <p className="text-gray-400 text-sm">Nenhuma cota aguardando aprovação no momento.</p>
-                  </div>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })
                 )}
               </div>
             )}
