@@ -4,14 +4,14 @@ import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { Link } from 'react-router';
-import { Clock, Ticket, TrendingUp } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { Clock, Ticket, TrendingUp, ChevronDown, Info, Coins, LifeBuoy } from 'lucide-react';
 
 export function Home() {
   const [logado, setLogado] = useState(false);
   const [usuarioNome, setUsuarioNome] = useState(''); 
   const [moedas, setMoedas] = useState(0); 
-
+  const [menuAberto, setMenuAberto] = useState(false);  
   const [mostrarLogin, setMostrarLogin] = useState(false);
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -125,24 +125,65 @@ export function Home() {
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-2 rounded-xl">
-                <Ticket className="w-8 h-8 text-white" />
+            
+            {/* LADO ESQUERDO: Logo + Menu */}
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-2 rounded-xl">
+                  <Ticket className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                    RIFEX
+                  </h1>
+                  <p className="text-sm text-gray-600 hidden md:block">Concorra a prêmios incríveis</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                  RIFEX
-                </h1>
-                <p className="text-sm text-gray-600">Concorra a prêmios incríveis</p>
+
+              {/* === MENU MULTITAREFAS === */}
+              <div className="relative hidden sm:block mt-1">
+                <button 
+                  onClick={() => setMenuAberto(!menuAberto)}
+                  className="flex items-center gap-1 text-gray-600 hover:text-purple-600 font-medium transition-colors"
+                >
+                  Explorar 
+                  <ChevronDown className={`w-4 h-4 transition-transform ${menuAberto ? 'rotate-180' : ''}`} />
+                </button>
+
+                {menuAberto && (
+                  <div className="absolute top-full mt-4 left-0 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2">
+                    <a href="#sobre" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors border-b border-gray-50">
+                      <Info className="w-4 h-4 text-blue-500" /> 
+                      <div className="flex flex-col">
+                        <span className="font-medium text-sm">Sobre Nós</span>
+                        <span className="text-xs text-gray-400">Conheça nossa história</span>
+                      </div>
+                    </a>
+                    <a href="#moedas" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors border-b border-gray-50">
+                      <Coins className="w-4 h-4 text-yellow-500" /> 
+                      <div className="flex flex-col">
+                        <span className="font-medium text-sm">Comprar Moedas</span>
+                        <span className="text-xs text-gray-400">Recarregue seu saldo</span>
+                      </div>
+                    </a>
+                    <a href="#suporte" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors">
+                      <LifeBuoy className="w-4 h-4 text-green-500" /> 
+                      <div className="flex flex-col">
+                        <span className="font-medium text-sm">Suporte</span>
+                        <span className="text-xs text-gray-400">Precisa de ajuda?</span>
+                      </div>
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
             
+            {/* LADO DIREITO: Botões de Login e Conta */}
             <div className="flex items-center gap-4">
               {logado ? (
                 <>
-                  <div className="flex items-center gap-2 mr-2">
+                  <div className="hidden md:flex items-center gap-2 mr-2">
                     <span className="text-sm font-medium text-gray-700">Olá, {usuarioNome}</span>
-                    {/* === AQUI ESTÁ A NOSSA CAIXINHA ESTILOSA DE MOEDAS! === */}
                     <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border border-yellow-300 shadow-sm flex items-center gap-1 px-3 py-1">
                       🪙 {moedas}
                     </Badge>
