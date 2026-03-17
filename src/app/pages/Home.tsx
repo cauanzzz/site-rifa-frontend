@@ -152,6 +152,7 @@ export function Home() {
 
                 {menuAberto && (
                   <div className="absolute top-full mt-4 left-0 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2">
+                    
                     <a href="#sobre" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors border-b border-gray-50">
                       <Info className="w-4 h-4 text-blue-500" /> 
                       <div className="flex flex-col">
@@ -159,13 +160,15 @@ export function Home() {
                         <span className="text-xs text-gray-400">Conheça nossa história</span>
                       </div>
                     </a>
-                    <a href="#moedas" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors border-b border-gray-50">
+                    
+                    <Link to="/comprar-moedas" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors border-b border-gray-50">
                       <Coins className="w-4 h-4 text-yellow-500" /> 
                       <div className="flex flex-col">
                         <span className="font-medium text-sm">Comprar Moedas</span>
                         <span className="text-xs text-gray-400">Recarregue seu saldo</span>
                       </div>
-                    </a>
+                    </Link>
+                    
                     <a href="#suporte" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors">
                       <LifeBuoy className="w-4 h-4 text-green-500" /> 
                       <div className="flex flex-col">
@@ -173,6 +176,7 @@ export function Home() {
                         <span className="text-xs text-gray-400">Precisa de ajuda?</span>
                       </div>
                     </a>
+
                   </div>
                 )}
               </div>

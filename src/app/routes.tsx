@@ -2,7 +2,8 @@ import { createBrowserRouter } from 'react-router';
 import { Home } from './pages/Home';
 import { RaffleDetail } from './pages/RaffleDetail';
 import { CreateRaffle } from './pages/CreateRaffle';
-import { MyRaffles } from './pages/MyRaffles'; // 
+import { MyRaffles } from './pages/MyRaffles'; 
+import { BuyCoins } from './pages/BuyCoins';
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ export const router = createBrowserRouter([
   {
     path: '/minhas-rifas', 
     Component: MyRaffles,
+  },
+  {
+    path: '/comprar-moedas', 
+    Component: BuyCoins,
   },
   {
     path: '*',
