@@ -4,6 +4,7 @@ import { RaffleDetail } from './pages/RaffleDetail';
 import { CreateRaffle } from './pages/CreateRaffle';
 import { MyRaffles } from './pages/MyRaffles'; 
 import { BuyCoins } from './pages/BuyCoins';
+import { AboutUs } from './pages/AboutUs';
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
   {
     path: '/comprar-moedas', 
     Component: BuyCoins,
+  },
+  {
+    path: '/about-us', 
+    Component: AboutUs,
   },
   {
     path: '*',

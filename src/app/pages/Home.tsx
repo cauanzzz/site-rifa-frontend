@@ -6,26 +6,25 @@ import { Progress } from '../components/ui/progress';
 import { Link } from 'react-router';
 import { useState, useEffect } from 'react';
 import { Clock, Ticket, TrendingUp, ChevronDown, Info, Coins, LifeBuoy } from 'lucide-react';
+import { Header } from '../components/header';
 
 export function Home() {
   const [logado, setLogado] = useState(false);
   const [usuarioNome, setUsuarioNome] = useState(''); 
   const [moedas, setMoedas] = useState(0); 
-  const [menuAberto, setMenuAberto] = useState(false);  
+  const [menuAberto, setMenuAberto] = useState(false);
+
   const [mostrarLogin, setMostrarLogin] = useState(false);
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [activeRaffles, setActiveRaffles] = useState<any[]>([]);
 
+  const [mostrarCadastro, setMostrarCadastro] = useState(false);
+  const [nomeCadastro, setNomeCadastro] = useState('');
+  const [emailCadastro, setEmailCadastro] = useState('');
+  const [senhaCadastro, setSenhaCadastro] = useState('');
+  
   useEffect(() => {
-    const usuarioSalvo = localStorage.getItem('usuario');
-    if (usuarioSalvo) {
-      const dados = JSON.parse(usuarioSalvo);
-      setLogado(true);
-      setUsuarioNome(dados.nome);
-      setMoedas(dados.moedas || 0); 
-    }
-
     const buscarRifas = async () => {
       try {
         const resposta = await fetch('https://localhost:7002/api/rifa');
@@ -34,17 +33,12 @@ export function Home() {
           setActiveRaffles(dados); 
         }
       } catch (erro) {
-        console.error("Erro ao buscar as rifas reais:", erro);
+        console.error("Erro ao buscar as rifas:", erro);
       }
     };
 
     buscarRifas();
   }, []);
-
-  const [mostrarCadastro, setMostrarCadastro] = useState(false);
-  const [nomeCadastro, setNomeCadastro] = useState('');
-  const [emailCadastro, setEmailCadastro] = useState('');
-  const [senhaCadastro, setSenhaCadastro] = useState('');
 
   const fazerLogin = async () => {
     try {
@@ -122,107 +116,7 @@ export function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            
-            {/* LADO ESQUERDO: Logo + Menu */}
-            <div className="flex items-center gap-8">
-              <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-2 rounded-xl">
-                  <Ticket className="w-8 h-8 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                    RIFEX
-                  </h1>
-                  <p className="text-sm text-gray-600 hidden md:block">Concorra a prêmios incríveis</p>
-                </div>
-              </div>
-
-              {/* === MENU MULTITAREFAS === */}
-              <div className="relative hidden sm:block mt-1">
-                <button 
-                  onClick={() => setMenuAberto(!menuAberto)}
-                  className="flex items-center gap-1 text-gray-600 hover:text-purple-600 font-medium transition-colors"
-                >
-                  Explorar 
-                  <ChevronDown className={`w-4 h-4 transition-transform ${menuAberto ? 'rotate-180' : ''}`} />
-                </button>
-
-                {menuAberto && (
-                  <div className="absolute top-full mt-4 left-0 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2">
-                    
-                    <a href="#sobre" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors border-b border-gray-50">
-                      <Info className="w-4 h-4 text-blue-500" /> 
-                      <div className="flex flex-col">
-                        <span className="font-medium text-sm">Sobre Nós</span>
-                        <span className="text-xs text-gray-400">Conheça nossa história</span>
-                      </div>
-                    </a>
-                    
-                    <Link to="/comprar-moedas" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors border-b border-gray-50">
-                      <Coins className="w-4 h-4 text-yellow-500" /> 
-                      <div className="flex flex-col">
-                        <span className="font-medium text-sm">Comprar Moedas</span>
-                        <span className="text-xs text-gray-400">Recarregue seu saldo</span>
-                      </div>
-                    </Link>
-                    
-                    <a href="#suporte" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors">
-                      <LifeBuoy className="w-4 h-4 text-green-500" /> 
-                      <div className="flex flex-col">
-                        <span className="font-medium text-sm">Suporte</span>
-                        <span className="text-xs text-gray-400">Precisa de ajuda?</span>
-                      </div>
-                    </a>
-
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            {/* LADO DIREITO: Botões de Login e Conta */}
-            <div className="flex items-center gap-4">
-              {logado ? (
-                <>
-                  <div className="hidden md:flex items-center gap-2 mr-2">
-                    <span className="text-sm font-medium text-gray-700">Olá, {usuarioNome}</span>
-                    <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border border-yellow-300 shadow-sm flex items-center gap-1 px-3 py-1">
-                      🪙 {moedas}
-                    </Badge>
-                  </div>
-                  <Link to="/minhas-rifas">
-                    <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
-                      Minhas Rifas
-                    </Button>
-                  </Link>
-                  <Link to="/criar-rifa">
-                    <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
-                      Criar Rifa
-                    </Button>
-                  </Link>
-                  <Button variant="outline" onClick={fazerLogout}>Sair</Button>
-                </>
-              ) : (  
-                <>
-                  <Button variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-50" onClick={() => setMostrarCadastro(true)}>
-                      Cadastrar-se
-                  </Button>
-                  
-                  <Button 
-                    onClick={() => setMostrarLogin(true)} 
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                  >
-                    Login
-                  </Button>
-                </>
-              )}
-            </div>
-
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12">

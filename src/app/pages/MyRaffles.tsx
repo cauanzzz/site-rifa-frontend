@@ -84,12 +84,10 @@ export function MyRaffles() {
 
   const formatCurrency = (value: number) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-  // Filtra compras usando o RG INVISÍVEL (E-mail do Comprador)
   const minhasRifasCompradas = rifas.filter(r => 
     r.cotas && r.cotas.some((c: any) => c.compradorEmail === usuarioLogado?.email)
   );
 
-  // Filtra as rifas criadas pelo RG INVISÍVEL (E-mail do Criador)
   const minhasRifasCriadas = rifas.filter(r => r.criadorEmail === usuarioLogado?.email);
 
   return (
