@@ -8,11 +8,14 @@ export function Header() {
     const [logado, setLogado] = useState(false);
     const [usuarioNome, setUsuarioNome] = useState(''); 
     const [moedas, setMoedas] = useState(0); 
+    const [isAdmin, setIsAdmin] = useState(false);
+    
     const [menuAberto, setMenuAberto] = useState(false);
     const [mostrarLogin, setMostrarLogin] = useState(false);
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [_activeRaffles, setActiveRaffles] = useState<any[]>([]);
+    
     const [mostrarCadastro, setMostrarCadastro] = useState(false);
     const [nomeCadastro, setNomeCadastro] = useState('');
     const [emailCadastro, setEmailCadastro] = useState('');
@@ -25,6 +28,7 @@ export function Header() {
             setLogado(true);
             setUsuarioNome(dados.nome);
             setMoedas(dados.moedas || 0); 
+            setIsAdmin(dados.isAdmin || dados.IsAdmin || false);
         }
 
         const buscarRifas = async () => {
@@ -58,6 +62,7 @@ export function Header() {
                 alert(`Bem-vindo(a) de volta, ${dadosUsuario.nome}! 🚀 Você tem ${dadosUsuario.moedas} moedas.`);
                 setUsuarioNome(dadosUsuario.nome);
                 setMoedas(dadosUsuario.moedas); 
+                setIsAdmin(dadosUsuario.isAdmin || dadosUsuario.IsAdmin || false);
                 setLogado(true);
                 setMostrarLogin(false);
                 setEmail('');
@@ -103,6 +108,7 @@ export function Header() {
         setLogado(false);
         setUsuarioNome('');
         setMoedas(0); 
+        setIsAdmin(false);
     };
 
     return (
@@ -111,7 +117,6 @@ export function Header() {
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex items-center justify-between">
                         
-                        {/* LADO ESQUERDO: Logo + Menu */}
                         <div className="flex items-center gap-8">
                             <div className="flex items-center gap-3">
                                 <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-2 rounded-xl">
@@ -125,7 +130,6 @@ export function Header() {
                                 </div>
                             </div>
 
-                            {/* === MENU MULTITAREFAS === */}
                             <div className="relative hidden sm:block mt-1">
                                 <button 
                                     onClick={() => setMenuAberto(!menuAberto)}
@@ -166,14 +170,13 @@ export function Header() {
                             </div>
                         </div>
                         
-                        {/* LADO DIREITO: Botões de Login e Conta */}
                         <div className="flex items-center gap-4">
                             {logado ? (
                                 <>
                                     <div className="hidden md:flex items-center gap-2 mr-2">
                                         <span className="text-sm font-medium text-gray-700">Olá, {usuarioNome}</span>
                                         <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border border-yellow-300 shadow-sm flex items-center gap-1 px-3 py-1">
-                                            🪙 {moedas}
+                                            {isAdmin ? '∞ Admin' : `🪙 ${moedas}`}
                                         </Badge>
                                     </div>
                                     <Link to="/minhas-rifas">
@@ -208,7 +211,6 @@ export function Header() {
                 </div>
             </header>
 
-            {/* === MODAL DE LOGIN === */}
             {mostrarLogin && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
@@ -249,7 +251,6 @@ export function Header() {
                 </div>
             )}
 
-            {/* === MODAL DE CADASTRO === */}
             {mostrarCadastro && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">

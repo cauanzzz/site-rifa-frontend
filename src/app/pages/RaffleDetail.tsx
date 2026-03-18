@@ -16,7 +16,7 @@ export function RaffleDetail() {
 
   const [raffle, setRaffle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [usuarioLogado, setUsuarioLogado] = useState<any>(null); // Memória de quem está logado
+  const [usuarioLogado, setUsuarioLogado] = useState<any>(null);
 
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
@@ -24,7 +24,6 @@ export function RaffleDetail() {
   const [nomePagador, setNomePagador] = useState('');
 
   useEffect(() => {
-    // Busca o usuário logado
     const usuarioSalvo = localStorage.getItem('usuario');
     if (usuarioSalvo) {
       const dados = JSON.parse(usuarioSalvo);
@@ -57,6 +56,7 @@ export function RaffleDetail() {
   const preco = raffle.preço || 0;
   const quantidadeTotal = raffle.quantidadeCotas || 1;
   const imagemPadrao = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=500&q=80";
+  const imagemReal = raffle.imagem || raffle.Imagem || imagemPadrao;
 
   const cotasReservadas = raffle.cotas ? raffle.cotas.filter((c: any) => c.status === 'Reservado').map((c: any) => c.numero) : [];
   const cotasVendidas = raffle.cotas ? raffle.cotas.filter((c: any) => c.status === 'Vendido').map((c: any) => c.numero) : [];
@@ -125,7 +125,7 @@ export function RaffleDetail() {
           <div className="lg:col-span-2">
             <Card>
               <div className="relative h-96 overflow-hidden rounded-t-lg">
-                <img src={imagemPadrao} alt={titulo} className="w-full h-full object-cover" />
+                <img src={imagemReal} alt={titulo} className="w-full h-full object-cover" />
                 <Badge className="absolute top-4 right-4 bg-green-500 text-lg px-4 py-2">Ativa</Badge>
               </div>
               <CardHeader>
@@ -146,7 +146,9 @@ export function RaffleDetail() {
                       <Calendar className="w-4 h-4 text-blue-600" />
                       <span className="text-sm text-gray-600">Sorteio</span>
                     </div>
-                    <p className="text-sm font-semibold text-blue-600">Em breve</p>
+                    <p className="text-sm font-semibold text-blue-600">
+                    {raffle.dataSorteio ? new Date(raffle.dataSorteio).toLocaleDateString('pt-BR') : 'Em breve'}
+                    </p>
                   </div>
                   <div className="bg-green-50 p-4 rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
@@ -160,7 +162,6 @@ export function RaffleDetail() {
             </Card>
           </div>
 
-          {/* Carrinho */}
           <div className="lg:col-span-1">
             <Card className="sticky top-24">
               <CardHeader>
@@ -201,7 +202,6 @@ export function RaffleDetail() {
           </div>
         </div>
 
-        {/* Quadro de Números */}
         <Card>
           <CardHeader>
             <CardTitle>Escolha seus números da sorte</CardTitle>
@@ -234,7 +234,6 @@ export function RaffleDetail() {
         </Card>
       </div>
 
-      {/* Modal de Pagamento */}
       <Dialog open={showPurchaseDialog} onOpenChange={setShowPurchaseDialog}>
         <DialogContent>
           <DialogHeader>
@@ -262,7 +261,7 @@ export function RaffleDetail() {
               />
               <p className="text-xs text-gray-500 mt-1">Sua reserva ficará vinculada à sua conta: {usuarioLogado?.email}</p>
             </div>
-            </div>
+          </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowPurchaseDialog(false)}>Cancelar</Button>

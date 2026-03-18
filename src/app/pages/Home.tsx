@@ -5,7 +5,7 @@ import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { Link } from 'react-router';
 import { useState, useEffect } from 'react';
-import { Clock, Ticket, TrendingUp, ChevronDown, Info, Coins, LifeBuoy } from 'lucide-react';
+import { Clock, Ticket, TrendingUp, ChevronDown, Info, Coins, LifeBuoy, RefreshCw } from 'lucide-react';
 import { Header } from '../components/header';
 
 export function Home() {
@@ -13,27 +13,39 @@ export function Home() {
   const [usuarioNome, setUsuarioNome] = useState(''); 
   const [moedas, setMoedas] = useState(0); 
   const [menuAberto, setMenuAberto] = useState(false);
-
   const [mostrarLogin, setMostrarLogin] = useState(false);
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [activeRaffles, setActiveRaffles] = useState<any[]>([]);
-
   const [mostrarCadastro, setMostrarCadastro] = useState(false);
   const [nomeCadastro, setNomeCadastro] = useState('');
   const [emailCadastro, setEmailCadastro] = useState('');
   const [senhaCadastro, setSenhaCadastro] = useState('');
-  
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const buscarRifas = async () => {
       try {
         const resposta = await fetch('https://localhost:7002/api/rifa');
+        
         if (resposta.ok) {
           const dados = await resposta.json();
-          setActiveRaffles(dados); 
+          if (Array.isArray(dados)) {
+            setActiveRaffles(dados); 
+          } else {
+            console.error("O C# não devolveu uma lista de rifas:", dados);
+            setActiveRaffles([]); 
+          }
+        } else {
+          const erroText = await resposta.text();
+          console.error("O C# devolveu um erro:", erroText);
+          setActiveRaffles([]);
         }
       } catch (erro) {
-        console.error("Erro ao buscar as rifas:", erro);
+        console.error("Erro de conexão com o servidor:", erro);
+        setActiveRaffles([]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -121,7 +133,7 @@ export function Home() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12">
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 pb-2">
             Rifas Ativas
           </h2>
           <p className="text-xl text-gray-600">
@@ -168,81 +180,92 @@ export function Home() {
           </div>
         </div>
 
-        {/* Raffles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activeRaffles && activeRaffles.map((raffle) => {
-            
-            const titulo = raffle.titulo || 'Rifa Sem Título';
-            const preco = raffle.preço || 0;
-            const quantidadeTotal = raffle.quantidadeCotas || 1;
-            
-            const cotasVendidas = raffle.cotas ? raffle.cotas.filter((c: any) => c.status !== 'Disponivel').length : 0;
-            const progress = (cotasVendidas / quantidadeTotal) * 100;
-
-            const imagemPadrao = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=500&q=80";
-
-            return (
-              <Card key={raffle.id} className="overflow-hidden hover:shadow-xl transition-shadow duration-300 border-2 hover:border-purple-200">
-                <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src={imagemPadrao} 
-                    alt={titulo}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                  <Badge className="absolute top-3 right-3 bg-green-500 hover:bg-green-600">
-                    Ativa
-                  </Badge>
-                </div>
-                
-                <CardHeader>
-                  <CardTitle className="text-xl">{titulo}</CardTitle>
-                  <CardDescription className="line-clamp-2">Concorra a este prêmio incrível e ajude a nossa causa!</CardDescription>
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Preço por número:</span>
-                    <span className="font-bold text-lg text-purple-600">{formatCurrency(preco)}</span>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Vendidos:</span>
-                      <span className="font-semibold">{cotasVendidas} / {quantidadeTotal}</span>
+        {/* TELA DE LOADING OU GRID DE RIFAS */}
+        {loading ? (
+           <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm mt-8">
+              <RefreshCw className="w-12 h-12 text-purple-600 animate-spin mx-auto mb-4" />
+              <p className="text-xl text-gray-800 font-bold">Carregando rifas...</p>
+              <p className="text-gray-500 mt-2">Baixando imagens do servidor...</p>
+           </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {activeRaffles && activeRaffles.map((raffle) => {
+                const titulo = raffle.titulo || 'Rifa Sem Título';
+                const preco = raffle.preço || 0;
+                const quantidadeTotal = raffle.quantidadeCotas || 1;
+                const cotasVendidas = raffle.cotasVendidas || 0;
+                const progress = (cotasVendidas / quantidadeTotal) * 100;
+                const imagemReal = raffle.imagem || raffle.Imagem || "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=500&q=80";
+                return (
+                  <Card key={raffle.id} className="overflow-hidden hover:shadow-xl transition-shadow duration-300 border-2 hover:border-purple-200">
+                    <div className="relative h-48 overflow-hidden">
+                      <img 
+                        src={imagemReal} 
+                        alt={titulo}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                      <Badge className="absolute top-3 right-3 bg-green-500 hover:bg-green-600">
+                        Ativa
+                      </Badge>
                     </div>
-                    <Progress value={progress} className="h-2" />
-                    <p className="text-xs text-gray-500 text-right">{progress.toFixed(0)}% vendido</p>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                    <Clock className="w-4 h-4" />
-                    <span>Sorteio: Em breve</span>
-                  </div>
-                </CardContent>
-                
-                <CardFooter>
-                  <Link to={`/rifa/${raffle.id}`} className="w-full">
-                    <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
-                      Ver Números
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </Card>
-            );
-          })}
-        </div>
-        {activeRaffles.length === 0 && (
-          <div className="text-center py-12">
-            <Ticket className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-xl text-gray-600">Nenhuma rifa ativa no momento</p>
-            <Link to="/criar-rifa">
-              <Button className="mt-4">Criar uma Rifa</Button>
-            </Link>
-          </div>
+                    
+                    <CardHeader>
+                      <CardTitle className="text-xl">{titulo}</CardTitle>
+                      <CardDescription className="line-clamp-2">Concorra a este prêmio incrível e ajude a nossa causa!</CardDescription>
+                    </CardHeader>
+                    
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Preço por número:</span>
+                        <span className="font-bold text-lg text-purple-600">{formatCurrency(preco)}</span>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Vendidos:</span>
+                          <span className="font-semibold">{cotasVendidas} / {quantidadeTotal}</span>
+                        </div>
+                        <Progress value={progress} className="h-2" />
+                        <p className="text-xs text-gray-500 text-right">{progress.toFixed(0)}% vendido</p>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-xl">
+                      <Clock className="w-4 h-4" />
+                        <span>
+                        Sorteio: {(raffle.dataSorteio || raffle.DataSorteio) 
+                        ? new Date(raffle.dataSorteio || raffle.DataSorteio).toLocaleDateString('pt-BR') 
+                        : 'Em breve'}
+                        </span>
+                      </div>
+                    </CardContent>
+                    
+                    <CardFooter>
+                      <Link to={`/rifa/${raffle.id}`} className="w-full">
+                        <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                          Ver Números
+                        </Button>
+                      </Link>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {activeRaffles.length === 0 && (
+              <div className="text-center py-12 mt-8">
+                <Ticket className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-xl text-gray-600">Nenhuma rifa ativa no momento</p>
+                <Link to="/criar-rifa">
+                  <Button className="mt-4">Criar uma Rifa</Button>
+                </Link>
+              </div>
+            )}
+          </>
         )}
       </section>
       
-      {/* Modal de Login */}
+      {/* Modal de Login (O SEU ORIGINAL) */}
       {mostrarLogin && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
@@ -283,7 +306,7 @@ export function Home() {
         </div>
       )}
 
-      {/* Modal de Cadastro */}
+      {/* Modal de Cadastro (O SEU ORIGINAL) */}
       {mostrarCadastro && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">

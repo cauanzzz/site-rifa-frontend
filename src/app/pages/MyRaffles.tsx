@@ -197,11 +197,21 @@ export function MyRaffles() {
                                   </div>
                                   <div>
                                     {/* Mostra o nome que a pessoa digitou + o email da conta dela */}
-                                    <p className="font-semibold text-gray-900">{cota.nome}</p>
-                                    <p className="text-xs text-gray-500">Conta: {cota.compradorEmail}</p>
+                                    <span className="text-gray-600">
+                                      Conta: {cota.compradorEmail} <br/>
+                                      <strong>Pagador: {cota.nomePagador || cota.NomePagador || 'Não informado'}</strong>
+                                    </span>
+                                    <span className="text-gray-500 text-sm flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                      {cota.dataReserva || cota.DataReserva 
+                                      ? new Date(cota.dataReserva || cota.DataReserva).toLocaleString('pt-BR') 
+                                      : 'Data não registrada'}
+                                    </span>
                                     <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
                                       <Clock className="w-3 h-3" />
-                                      <span>Pagamento via: <strong>{cota.tel}</strong></span>
+                                      <span className="text-gray-500">
+                                        Pagamento via: <strong>{cota.formaPagamento || cota.FormaPagamento || 'Não informado'}</strong>
+                                      </span>
                                     </div>
                                   </div>
                                 </div>
@@ -211,13 +221,13 @@ export function MyRaffles() {
                                   <Button 
                                     onClick={() => rejeitarPagamento(rifa.id, cota.numero)} 
                                     variant="outline" 
-                                    className="text-red-600 border-red-200 hover:bg-red-50 flex-1 md:flex-none"
+                                    className="cursor-pointer text-red-600 border-red-200 hover:bg-red-50 flex-1 md:flex-none"
                                   >
                                     Recusar
                                   </Button>
                                   <Button 
                                     onClick={() => aprovarPagamento(rifa.id, cota.numero)} 
-                                    className="bg-green-600 hover:bg-green-700 text-white gap-2 flex-1 md:flex-none"
+                                    className="cursor-pointer bg-green-600 hover:bg-green-700 text-white gap-2 flex-1 md:flex-none"
                                   >
                                     <CheckCircle className="w-4 h-4" /> Aprovar
                                   </Button>
