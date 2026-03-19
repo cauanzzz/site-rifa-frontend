@@ -43,7 +43,7 @@ export function AboutUs() {
              <Ticket className="w-8 h-8 text-purple-600" />
           </div>
          <h1 className="text-4xl md:text-5xl font-bold mb-6 pb-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            A Nova Era das Rifas Digitais
+            A nova era das rifas digitais
           </h1>
           <p className="text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
             O RIFEX nasceu para transformar o mercado de sorteios. Unimos a emoção das rifas tradicionais com a segurança e a transparência da tecnologia moderna, criando um ecossistema confiável para criadores e participantes.

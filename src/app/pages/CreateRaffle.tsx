@@ -21,6 +21,7 @@ export function CreateRaffle() {
   const [drawDate, setDrawDate] = useState('');
   const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
   const [salvando, setSalvando] = useState(false);
+  const [temData, setTemData] = useState(false);
 
   useEffect(() => {
     const usuarioSalvo = localStorage.getItem('usuario');
@@ -55,8 +56,13 @@ export function CreateRaffle() {
 
   const prepararCriacao = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!title || !price || !totalNumbers) {
       toast.error('Preencha os campos obrigatórios!');
+      return;
+    }
+    if (temData && !drawDate) {
+      toast.error('Preencha a data do sorteio ou desmarque a opção!');
       return;
     }
     if (saldoInsuficiente) {
@@ -87,7 +93,7 @@ export function CreateRaffle() {
           Preço: priceNum,
           QuantidadeCotas: qtdNumeros,
           CriadorEmail: usuarioLogado.email,
-          DataSorteio: drawDate
+          DataSorteio: temData ? drawDate : null
         })
       });
 
@@ -203,9 +209,32 @@ export function CreateRaffle() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="drawDate">Data e Hora do Sorteio *</Label>
-                  <Input id="drawDate" type="datetime-local" value={drawDate} onChange={(e) => setDrawDate(e.target.value)} required />
+                <div className="space-y-4 bg-gray-50 p-5 rounded-xl border border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-base font-semibold text-gray-900">Data do Sorteio</Label>
+                      <p className="text-sm text-gray-500">Já tem uma data definida para sortear?</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={temData} 
+                        onChange={(e) => {
+                          setTemData(e.target.checked);
+                          if (!e.target.checked) setDrawDate(''); 
+                        }} 
+                      />
+                      <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                    </label>
+                  </div>
+
+                  {temData && (
+                    <div className="space-y-2 pt-3 border-t border-gray-200 animate-in fade-in slide-in-from-top-2">
+                      <Label htmlFor="drawDate">Escolha a Data e Hora *</Label>
+                      <Input id="drawDate" type="datetime-local" value={drawDate} onChange={(e) => setDrawDate(e.target.value)} required={temData} />
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-4 pt-4">

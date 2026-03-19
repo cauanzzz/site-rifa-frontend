@@ -207,7 +207,7 @@ export function RaffleDetail() {
             <CardTitle>Escolha seus números da sorte</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-15 gap-2">
+            <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-25 gap-2">
               {Array.from({ length: quantidadeTotal }, (_, i) => i + 1).map(num => {
                 const isSold = cotasVendidas.includes(num);
                 const isReserved = cotasReservadas.includes(num);

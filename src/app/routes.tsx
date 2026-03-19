@@ -5,6 +5,7 @@ import { CreateRaffle } from './pages/CreateRaffle';
 import { MyRaffles } from './pages/MyRaffles'; 
 import { BuyCoins } from './pages/BuyCoins';
 import { AboutUs } from './pages/AboutUs';
+import { Suporte } from './pages/Suporte';
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ export const router = createBrowserRouter([
   {
     path: '/about-us', 
     Component: AboutUs,
+  },
+  {
+    path: '/suporte', 
+    Component: Suporte,
   },
   {
     path: '*',

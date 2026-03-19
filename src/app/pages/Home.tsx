@@ -5,8 +5,9 @@ import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { Link } from 'react-router';
 import { useState, useEffect } from 'react';
-import { Clock, Ticket, TrendingUp, ChevronDown, Info, Coins, LifeBuoy, RefreshCw } from 'lucide-react';
+import { Clock, Ticket, TrendingUp, ChevronDown, Info, Coins, LifeBuoy, RefreshCw, Search } from 'lucide-react';
 import { Header } from '../components/header';
+import { Input } from '../components/ui/input';
 
 export function Home() {
   const [logado, setLogado] = useState(false);
@@ -22,6 +23,7 @@ export function Home() {
   const [emailCadastro, setEmailCadastro] = useState('');
   const [senhaCadastro, setSenhaCadastro] = useState('');
   const [loading, setLoading] = useState(true);
+  const [termoBusca, setTermoBusca] = useState('');
 
   useEffect(() => {
     const buscarRifas = async () => {
@@ -51,6 +53,11 @@ export function Home() {
 
     buscarRifas();
   }, []);
+
+  const rifasFiltradas = activeRaffles.filter(rifa => {
+    const tituloDaRifa = rifa.titulo || rifa.Titulo || '';
+    return tituloDaRifa.toLowerCase().includes(termoBusca.toLowerCase());
+  });
 
   const fazerLogin = async () => {
     try {
@@ -130,18 +137,16 @@ export function Home() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
       <Header />
 
-      {/* Hero Section */}
       <section className="container mx-auto px-4 py-12">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <h2 className="text-4xl md:text-5xl font-bold mb-4 pb-2">
-            Rifas Ativas
+            Rifas ativas
           </h2>
           <p className="text-xl text-gray-600">
             Escolha sua rifa favorita e concorra a prêmios incríveis com apenas alguns cliques!
           </p>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
             <div className="flex items-center gap-4">
@@ -180,7 +185,6 @@ export function Home() {
           </div>
         </div>
 
-        {/* TELA DE LOADING OU GRID DE RIFAS */}
         {loading ? (
            <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm mt-8">
               <RefreshCw className="w-12 h-12 text-purple-600 animate-spin mx-auto mb-4" />
@@ -189,9 +193,22 @@ export function Home() {
            </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {activeRaffles && activeRaffles.map((raffle) => {
-                const titulo = raffle.titulo || 'Rifa Sem Título';
+            <div className="mb-8 relative max-w-md mx-auto lg:mx-0">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <Input
+                type="text"
+                placeholder="Buscar rifa pelo nome..."
+                className="pl-10 w-full bg-white border-gray-200 shadow-sm"
+                value={termoBusca}
+                onChange={(e) => setTermoBusca(e.target.value)}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {rifasFiltradas.map((raffle) => {
+                const titulo = raffle.titulo || raffle.Titulo || 'Rifa Sem Título';
                 const preco = raffle.preço || 0;
                 const quantidadeTotal = raffle.quantidadeCotas || 1;
                 const cotasVendidas = raffle.cotasVendidas || 0;
@@ -252,20 +269,16 @@ export function Home() {
               })}
             </div>
 
-            {activeRaffles.length === 0 && (
+            {rifasFiltradas.length === 0 && !loading && (
               <div className="text-center py-12 mt-8">
                 <Ticket className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-xl text-gray-600">Nenhuma rifa ativa no momento</p>
-                <Link to="/criar-rifa">
-                  <Button className="mt-4">Criar uma Rifa</Button>
-                </Link>
+                <p className="text-xl text-gray-600">Nenhuma rifa encontrada com esse nome.</p>
               </div>
             )}
           </>
         )}
       </section>
       
-      {/* Modal de Login (O SEU ORIGINAL) */}
       {mostrarLogin && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
@@ -306,7 +319,6 @@ export function Home() {
         </div>
       )}
 
-      {/* Modal de Cadastro (O SEU ORIGINAL) */}
       {mostrarCadastro && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">

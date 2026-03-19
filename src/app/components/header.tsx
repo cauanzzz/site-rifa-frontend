@@ -158,13 +158,13 @@ export function Header() {
                                             </div>
                                         </Link>
                                         
-                                        <a href="#suporte" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors">
+                                        <Link to="/suporte" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors">
                                             <LifeBuoy className="w-4 h-4 text-green-500" /> 
-                                            <div className="flex flex-col">
-                                                <span className="font-medium text-sm">Suporte</span>
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium text-sm">Suporte</span>
                                                 <span className="text-xs text-gray-400">Precisa de ajuda?</span>
-                                            </div>
-                                        </a>
+                                                </div>
+                                        </Link>
                                     </div>
                                 )}
                             </div>
