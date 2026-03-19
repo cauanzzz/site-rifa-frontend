@@ -25,39 +25,59 @@ export function Home() {
   const [loading, setLoading] = useState(true);
   const [termoBusca, setTermoBusca] = useState('');
 
-  useEffect(() => {
-    const buscarRifas = async () => {
-      try {
-        const resposta = await fetch('https://localhost:7002/api/rifa');
-        
-        if (resposta.ok) {
-          const dados = await resposta.json();
-          if (Array.isArray(dados)) {
-            setActiveRaffles(dados); 
-          } else {
-            console.error("O C# não devolveu uma lista de rifas:", dados);
-            setActiveRaffles([]); 
-          }
-        } else {
-          const erroText = await resposta.text();
-          console.error("O C# devolveu um erro:", erroText);
-          setActiveRaffles([]);
-        }
-      } catch (erro) {
-        console.error("Erro de conexão com o servidor:", erro);
-        setActiveRaffles([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  console.log("Rifas que chegaram da API:", activeRaffles);
 
-    buscarRifas();
+  const carregarTodasAsRifas = async () => {
+    setLoading(true);
+    try {
+      const resposta = await fetch('https://localhost:7002/api/rifa');
+      
+      if (resposta.ok) {
+        const dados = await resposta.json();
+        if (Array.isArray(dados)) {
+          setActiveRaffles(dados); 
+        } else {
+          setActiveRaffles([]); 
+        }
+      } else {
+        setActiveRaffles([]);
+      }
+    } catch (erro) {
+      console.error("Erro de conexão com o servidor:", erro);
+      setActiveRaffles([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    carregarTodasAsRifas();
   }, []);
 
-  const rifasFiltradas = activeRaffles.filter(rifa => {
-    const tituloDaRifa = rifa.titulo || rifa.Titulo || '';
-    return tituloDaRifa.toLowerCase().includes(termoBusca.toLowerCase());
-  });
+  const buscarPorCriador = async () => {
+    if (!termoBusca.trim()) {
+      carregarTodasAsRifas(); 
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const resposta = await fetch(`https://localhost:7002/api/Rifa/buscar-por-criador?nome=${termoBusca}`);
+      
+      if (resposta.ok) {
+        const dados = await resposta.json();
+        setActiveRaffles(dados); 
+      } else if (resposta.status === 404) {
+        setActiveRaffles([]); 
+        alert('Nenhuma rifa encontrada para este criador.');
+      }
+    } catch (erro) {
+      console.error("Erro na busca:", erro);
+      alert('Erro de conexão com a API.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fazerLogin = async () => {
     try {
@@ -185,35 +205,42 @@ export function Home() {
           </div>
         </div>
 
+        <div className="mb-8 flex gap-2 max-w-md mx-auto lg:mx-0">
+          <div className="relative flex-1">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <Input
+              type="text"
+              placeholder="Buscar pelo nome do criador..."
+              className="pl-10 w-full bg-white border-gray-200 shadow-sm"
+              value={termoBusca}
+              onChange={(e) => setTermoBusca(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && buscarPorCriador()} 
+            />
+          </div>
+          <Button onClick={buscarPorCriador} className="bg-purple-600 hover:bg-purple-700 text-white shadow-sm">
+            Buscar
+          </Button>
+        </div>
+
         {loading ? (
            <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm mt-8">
               <RefreshCw className="w-12 h-12 text-purple-600 animate-spin mx-auto mb-4" />
               <p className="text-xl text-gray-800 font-bold">Carregando rifas...</p>
-              <p className="text-gray-500 mt-2">Baixando imagens do servidor...</p>
+              <p className="text-gray-500 mt-2">Buscando informações do servidor...</p>
            </div>
         ) : (
           <>
-            <div className="mb-8 relative max-w-md mx-auto lg:mx-0">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
-              </div>
-              <Input
-                type="text"
-                placeholder="Buscar rifa pelo nome..."
-                className="pl-10 w-full bg-white border-gray-200 shadow-sm"
-                value={termoBusca}
-                onChange={(e) => setTermoBusca(e.target.value)}
-              />
-            </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {rifasFiltradas.map((raffle) => {
+              {activeRaffles.map((raffle) => {
                 const titulo = raffle.titulo || raffle.Titulo || 'Rifa Sem Título';
                 const preco = raffle.preço || 0;
                 const quantidadeTotal = raffle.quantidadeCotas || 1;
                 const cotasVendidas = raffle.cotasVendidas || 0;
                 const progress = (cotasVendidas / quantidadeTotal) * 100;
                 const imagemReal = raffle.imagem || raffle.Imagem || "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=500&q=80";
+                
                 return (
                   <Card key={raffle.id} className="overflow-hidden hover:shadow-xl transition-shadow duration-300 border-2 hover:border-purple-200">
                     <div className="relative h-48 overflow-hidden">
@@ -229,7 +256,9 @@ export function Home() {
                     
                     <CardHeader>
                       <CardTitle className="text-xl">{titulo}</CardTitle>
-                      <CardDescription className="line-clamp-2">Concorra a este prêmio incrível e ajude a nossa causa!</CardDescription>
+                      <CardDescription className="line-clamp-2">
+                            Criador: {raffle.criadorNome || raffle.CriadorNome || raffle.criadorEmail}
+                      </CardDescription>                    
                     </CardHeader>
                     
                     <CardContent className="space-y-4">
@@ -269,16 +298,16 @@ export function Home() {
               })}
             </div>
 
-            {rifasFiltradas.length === 0 && !loading && (
+            {activeRaffles.length === 0 && !loading && (
               <div className="text-center py-12 mt-8">
                 <Ticket className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-xl text-gray-600">Nenhuma rifa encontrada com esse nome.</p>
+                <p className="text-xl text-gray-600">Nenhuma rifa encontrada para exibir.</p>
               </div>
             )}
           </>
         )}
       </section>
-      
+
       {mostrarLogin && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
