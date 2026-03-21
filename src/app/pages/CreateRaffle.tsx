@@ -255,7 +255,7 @@ export function CreateRaffle() {
             </div>
             <h2 className="text-2xl font-bold text-center mb-2 text-gray-900">Confirmar Criação</h2>
             <p className="text-center text-gray-600 mb-6">Você está prestes a criar uma rifa com <strong>{qtdNumeros} números</strong>.</p>
-            <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-8">
+            <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-gray-600">Seu saldo atual:</span>
                 <span className="font-semibold text-gray-900">{ehAdmin ? '∞ Admin' : `${saldoAtual} moedas`}</span>
@@ -265,10 +265,16 @@ export function CreateRaffle() {
                 <span className="font-bold text-red-600">{ehAdmin ? 'Grátis' : `- ${custoEmMoedas} moedas`}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-900 font-medium">Saldo após criação:</span>
+                <span className="text-gray-600 font-medium">Saldo após criação:</span>
                 <span className="font-bold text-green-600 text-lg">{ehAdmin ? '∞ Admin' : `${saldoAtual - custoEmMoedas} moedas`}</span>
               </div>
             </div>
+
+            <p className="text-[10px] text-muted-foreground text-center mb-6 leading-tight italic">
+              Ao criar esta rifa, você declara estar ciente de que este site é apenas uma plataforma de gestão. 
+              Não temos relação com o prêmio ou vínculo direto com a organização da rifa.
+            </p>
+
             <div className="flex gap-3">
               <Button 
                 variant="outline" 

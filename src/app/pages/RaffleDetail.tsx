@@ -261,6 +261,13 @@ export function RaffleDetail() {
               />
               <p className="text-xs text-gray-500 mt-1">Sua reserva ficará vinculada à sua conta: {usuarioLogado?.email}</p>
             </div>
+
+            <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+              <p className="text-[11px] text-muted-foreground text-center italic leading-tight">
+                Atenção: Este site não tem relação com o prêmio e vínculo direto com a rifa. 
+                Toda a responsabilidade pela entrega e sorteio é exclusiva do criador.
+              </p>
+            </div>
           </div>
 
           <DialogFooter>

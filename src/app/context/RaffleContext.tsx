@@ -83,7 +83,6 @@ export function RaffleProvider({ children }: { children: ReactNode }) {
     
     setPurchases(prev => [...prev, newPurchase]);
     
-    // Update the raffle with sold numbers
     setRaffles(prev => prev.map(raffle => {
       if (raffle.id === purchaseData.raffleId) {
         return {

@@ -25,8 +25,6 @@ export function Home() {
   const [loading, setLoading] = useState(true);
   const [termoBusca, setTermoBusca] = useState('');
 
-  console.log("Rifas que chegaram da API:", activeRaffles);
-
   const carregarTodasAsRifas = async () => {
     setLoading(true);
     try {
