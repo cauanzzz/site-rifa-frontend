@@ -26,7 +26,7 @@ export function Suporte() {
     setEnviando(true);
 
     try {
-      const response = await fetch('https://localhost:7002/api/MensagensSuporte', {
+      const response = await fetch('http://localhost:5267/api/MensagensSuporte', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

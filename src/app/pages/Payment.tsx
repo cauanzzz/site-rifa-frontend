@@ -5,9 +5,9 @@ import { ArrowLeft, QrCode, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PACOTES = {
-  'Iniciante': { moedas: 50, valor: 45.00 },
-  'Popular': { moedas: 110, valor: 80.00 },
-  'Profissional': { moedas: 550, valor: 350.00 }
+  'Iniciante': { moedas: 150, valor: 20.25 },
+  'Popular': { moedas: 350, valor: 36.54 },
+  'Profissional': { moedas: 500, valor: 47.50 }
 };
 
 export function Pagamento() {
@@ -15,6 +15,8 @@ export function Pagamento() {
   const navigate = useNavigate();
   const [usuarioLogado, setUsuarioLogado] = useState<any>(null);
   const [enviando, setEnviando] = useState(false);
+  const [sucesso, setSucesso] = useState(false);
+  const [nomePix, setNomePix] = useState('');
 
   useEffect(() => {
     const usuarioSalvo = localStorage.getItem('usuario');
@@ -36,25 +38,31 @@ export function Pagamento() {
   const confirmarPagamento = async () => {
     if (!infoPacote || !usuarioLogado) return;
     
+    if (nomePix.trim() === '') {
+      toast.error('Por favor, informe o nome de quem fez o PIX.');
+      return;
+    }
+    
     setEnviando(true);
 
     try {
-      const response = await fetch('http://localhost:5174/api/admin/solicitar-moedas', {
+      const response = await fetch('http://localhost:5267/api/admin/solicitar-moedas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          UsuarioId: usuarioLogado.id || usuarioLogado.Id,
-          Pacote: pacote,
-          QuantidadeMoedas: infoPacote.moedas,
-          ValorPago: infoPacote.valor
+          usuarioId: usuarioLogado.id || usuarioLogado.Id,
+          pacote: pacote,
+          quantidadeMoedas: infoPacote.moedas,
+          valorPago: infoPacote.valor,
+          nomeTitularPix: nomePix
         })
       });
 
       if (response.ok) {
-        toast.success('Solicitação enviada! Redirecionando...');
-        setTimeout(() => navigate('/'), 2000); 
+        setSucesso(true);
       } else {
-        toast.error('Erro ao enviar solicitação.');
+        const errorData = await response.json().catch(() => null);
+        toast.error(errorData?.erro || 'Erro ao enviar solicitação.');
       }
     } catch (error) {
       toast.error('Erro de conexão com o servidor!');
@@ -64,6 +72,28 @@ export function Pagamento() {
   };
 
   if (!infoPacote) return null; 
+
+  if (sucesso) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center border border-slate-100">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <ShieldCheck className="w-10 h-10 text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Tudo certo!</h2>
+          <p className="text-gray-600 mb-8">
+            Sua solicitação foi enviada com sucesso. Um administrador está confirmando o seu PIX e logo as moedas cairão na sua conta!
+          </p>
+          <Button 
+            onClick={() => navigate('/')} 
+            className="w-full py-6 text-lg bg-purple-600 hover:bg-purple-700 text-white"
+          >
+            Voltar para o Início
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 py-12 px-4 flex items-center justify-center">
@@ -95,13 +125,24 @@ export function Pagamento() {
               </div>
             </div>
 
+            <div className="mb-4 text-left">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Titular do PIX</label>
+              <input 
+                type="text" 
+                placeholder="Ex: João da Silva"
+                value={nomePix}
+                onChange={(e) => setNomePix(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 outline-none"
+              />
+            </div>
+
             <div className="space-y-4">
               <Button 
                 onClick={confirmarPagamento} 
                 disabled={enviando}
                 className="w-full py-6 text-lg bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-200"
               >
-                {enviando ? 'Processando...' : 'Já fiz o Pagamento'}
+                {enviando ? 'Processando...' : 'Já fiz o Pagamento!'}
               </Button>
               <p className="text-xs text-center text-slate-400 flex items-center justify-center gap-1">
                 <ShieldCheck className="w-4 h-4" /> Pagamento 100% seguro

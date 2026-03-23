@@ -34,14 +34,13 @@ export function RaffleDetail() {
 
     const buscarRifa = async () => {
       try {
-        const resposta = await fetch('https://localhost:7002/api/rifa');
+        const resposta = await fetch('http://localhost:5267/api/rifa');
         if (resposta.ok) {
           const todasRifas = await resposta.json();
           const rifaCerta = todasRifas.find((r: any) => r.id === parseInt(id!));
           setRaffle(rifaCerta);
         }
       } catch (erro) {
-        console.error(erro);
         toast.error('Erro ao conectar com o servidor C#');
       } finally {
         setLoading(false);
@@ -59,16 +58,20 @@ export function RaffleDetail() {
   const imagemPadrao = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=500&q=80";
   const imagemReal = raffle.imagem || raffle.Imagem || imagemPadrao;
 
+  const isEncerrada = raffle.status === 'Encerrada' || raffle.Status === 'Encerrada';
+  const numeroSorteado = raffle.numeroSorteado || raffle.NumeroSorteado;
+
   const cotasReservadas = raffle.cotas ? raffle.cotas.filter((c: any) => c.status === 'Reservado').map((c: any) => c.numero) : [];
   const cotasVendidas = raffle.cotas ? raffle.cotas.filter((c: any) => c.status === 'Vendido').map((c: any) => c.numero) : [];
   const indisponiveis = [...cotasReservadas, ...cotasVendidas];
 
   const toggleNumber = (num: number) => {
-    if (indisponiveis.includes(num)) return; 
+    if (isEncerrada || indisponiveis.includes(num)) return; 
     setSelectedNumbers(prev => prev.includes(num) ? prev.filter(n => n !== num) : [...prev, num]);
   };
 
   const abrirModalDeCompra = () => {
+    if (isEncerrada) return;
     if (!usuarioLogado) {
       toast.error('Você precisa fazer Login para reservar números!');
       return;
@@ -83,7 +86,7 @@ export function RaffleDetail() {
     }
 
     try {
-      const resposta = await fetch('https://localhost:7002/api/rifa/comprar', {
+      const resposta = await fetch('http://localhost:5267/api/rifa/comprar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -115,19 +118,35 @@ export function RaffleDetail() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
       <header className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
-          <Button variant="ghost" onClick={() => navigate('/')} className="gap-2">
+          <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
             <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8">
+        
+        {isEncerrada && numeroSorteado != null && (
+          <div className="bg-gradient-to-r from-yellow-100 to-amber-100 border-2 border-yellow-400 p-6 rounded-2xl mb-8 text-center shadow-md animate-in slide-in-from-top-4">
+            <Trophy className="w-12 h-12 text-yellow-600 mx-auto mb-2" />
+            <h2 className="text-3xl font-black text-yellow-800 tracking-tight">RIFA ENCERRADA</h2>
+            <div className="mt-4 flex flex-col md:flex-row items-center justify-center gap-3">
+              <span className="text-lg font-medium text-yellow-700">O número vencedor foi:</span>
+              <span className="font-black text-4xl px-6 py-2 bg-white rounded-xl border-2 border-yellow-400 text-yellow-600 shadow-sm">
+                {numeroSorteado.toString().padStart(4, '0')}
+              </span>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           <div className="lg:col-span-2">
             <Card>
               <div className="relative h-96 overflow-hidden rounded-t-lg">
-                <img src={imagemReal} alt={titulo} className="w-full h-full object-cover" />
-                <Badge className="absolute top-4 right-4 bg-green-500 text-lg px-4 py-2">Ativa</Badge>
+                <img src={imagemReal} alt={titulo} className={`w-full h-full object-cover ${isEncerrada ? 'grayscale-[30%]' : ''}`} />
+                <Badge className={`absolute top-4 right-4 text-lg px-4 py-2 ${isEncerrada ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500'}`}>
+                  {isEncerrada ? 'Encerrada' : 'Ativa'}
+                </Badge>
               </div>
               <CardHeader>
                 <CardTitle className="text-3xl mb-2">{titulo}</CardTitle>
@@ -177,7 +196,13 @@ export function RaffleDetail() {
                   <Progress value={progress} className="h-2" />
                 </div>
 
-                {selectedNumbers.length > 0 ? (
+                {isEncerrada ? (
+                  <div className="border-t pt-6 mt-4">
+                    <Button disabled className="w-full py-6 text-lg bg-slate-200 text-slate-500 cursor-not-allowed">
+                      Vendas Encerradas
+                    </Button>
+                  </div>
+                ) : selectedNumbers.length > 0 ? (
                   <>
                     <div className="border-t pt-4 space-y-2">
                       <div className="flex justify-between text-lg">
@@ -205,7 +230,9 @@ export function RaffleDetail() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Escolha seus números da sorte</CardTitle>
+            <CardTitle>
+              {isEncerrada ? 'Números da Rifa' : 'Escolha seus números da sorte'}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-25 gap-2">
@@ -213,20 +240,40 @@ export function RaffleDetail() {
                 const isSold = cotasVendidas.includes(num);
                 const isReserved = cotasReservadas.includes(num);
                 const isSelected = selectedNumbers.includes(num);
+                const isWinner = isEncerrada && num === numeroSorteado;
+
+                let buttonClass = '';
+
+                if (isWinner) {
+                  buttonClass = 'bg-yellow-400 text-yellow-900 border-2 border-yellow-500 shadow-xl scale-110 z-10 cursor-default';
+                } else if (isEncerrada) {
+                  buttonClass = 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60';
+                } else if (isSold) {
+                  buttonClass = 'bg-gray-200 text-gray-400 cursor-not-allowed';
+                } else if (isReserved) {
+                  buttonClass = 'bg-yellow-100 text-yellow-600 border-2 border-yellow-300 cursor-not-allowed';
+                } else if (isSelected) {
+                  buttonClass = 'bg-gradient-to-br from-purple-600 to-blue-600 text-white scale-95 shadow-lg';
+                } else {
+                  buttonClass = 'bg-white border-2 border-gray-200 hover:border-purple-400 hover:scale-105 cursor-pointer';
+                }
 
                 return (
                   <button
-                    key={num} onClick={() => toggleNumber(num)} disabled={isSold || isReserved}
-                    className={`aspect-square rounded-lg font-semibold text-sm transition-all flex items-center justify-center
-                      ${isSold ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 
-                        isReserved ? 'bg-yellow-100 text-yellow-600 border-2 border-yellow-300 cursor-not-allowed' :
-                        isSelected ? 'bg-gradient-to-br from-purple-600 to-blue-600 text-white scale-95 shadow-lg' :
-                        'bg-white border-2 border-gray-200 hover:border-purple-400 hover:scale-105'
-                      }`}
+                    key={num} 
+                    onClick={() => toggleNumber(num)} 
+                    disabled={isSold || isReserved || isEncerrada}
+                    className={`aspect-square rounded-lg font-semibold text-sm transition-all flex items-center justify-center ${buttonClass}`}
                   >
-                    {isSold && <Check className="w-4 h-4" />}
-                    {isReserved && <Clock className="w-4 h-4" />}
-                    {!isSold && !isReserved && num.toString().padStart(4, '0')}
+                    {isWinner ? (
+                      <Trophy className="w-5 h-5" />
+                    ) : isSold && !isEncerrada ? (
+                      <Check className="w-4 h-4" />
+                    ) : isReserved && !isEncerrada ? (
+                      <Clock className="w-4 h-4" />
+                    ) : (
+                      num.toString().padStart(4, '0')
+                    )}
                   </button>
                 );
               })}

@@ -28,7 +28,7 @@ export function Home() {
   const carregarTodasAsRifas = async () => {
     setLoading(true);
     try {
-      const resposta = await fetch('https://localhost:7002/api/rifa');
+      const resposta = await fetch('http://localhost:5267/api/rifa');
       
       if (resposta.ok) {
         const dados = await resposta.json();
@@ -60,7 +60,7 @@ export function Home() {
 
     setLoading(true);
     try {
-      const resposta = await fetch(`https://localhost:7002/api/Rifa/buscar-por-criador?nome=${termoBusca}`);
+      const resposta = await fetch(`http://localhost:5267/api/Rifa/buscar-por-criador?nome=${termoBusca}`);
       
       if (resposta.ok) {
         const dados = await resposta.json();
@@ -79,7 +79,7 @@ export function Home() {
 
   const fazerLogin = async () => {
     try {
-      const resposta = await fetch('https://localhost:7002/api/auth/login', {
+      const resposta = await fetch('http://localhost:5267/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha })
@@ -109,7 +109,7 @@ export function Home() {
 
   const fazerCadastro = async () => {
     try {
-      const resposta = await fetch('https://localhost:7002/api/auth/cadastro', {
+      const resposta = await fetch('http://localhost:5267/api/auth/cadastro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -231,7 +231,9 @@ export function Home() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {activeRaffles.map((raffle) => {
+              {activeRaffles
+                .filter(r => r.status !== 'Encerrada' && r.Status !== 'Encerrada')
+                .map((raffle) => {
                 const titulo = raffle.titulo || raffle.Titulo || 'Rifa Sem Título';
                 const preco = raffle.preço || 0;
                 const quantidadeTotal = raffle.quantidadeCotas || 1;
