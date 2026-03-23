@@ -2,12 +2,21 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
-import { ArrowLeft, Check, Coins, ShieldCheck, Sparkles, Star, Trophy } from 'lucide-react';
+import { ArrowLeft, Check, Coins, ShieldCheck, Sparkles, Star, Trophy, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
+
+const PACOTES = {
+  'Iniciante': { moedas: 50, valor: 45.00 },
+  'Popular': { moedas: 110, valor: 80.00 },
+  'Profissional': { moedas: 550, valor: 350.00 }
+};
 
 export function BuyCoins() {
   const navigate = useNavigate();
   const [usuarioLogado, setUsuarioLogado] = useState<any>(null);
+  
+  const [pacoteSelecionado, setPacoteSelecionado] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
     const usuarioSalvo = localStorage.getItem('usuario');
@@ -20,12 +29,79 @@ export function BuyCoins() {
   }, [navigate]);
 
   const handleComprar = (pacote: string) => {
-    toast.success(`Redirecionando para o pagamento do pacote ${pacote}... 🚀`);
+    setPacoteSelecionado(pacote);
+  };
+
+  const confirmarPagamento = async () => {
+    if (!pacoteSelecionado || !usuarioLogado) return;
+    
+    setEnviando(true);
+    const infoPacote = PACOTES[pacoteSelecionado as keyof typeof PACOTES];
+
+    try {
+      const response = await fetch('http://localhost:5174/api/admin/solicitar-moedas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          UsuarioId: usuarioLogado.id || usuarioLogado.Id,
+          Pacote: pacoteSelecionado,
+          QuantidadeMoedas: infoPacote.moedas,
+          ValorPago: infoPacote.valor
+        })
+      });
+
+      if (response.ok) {
+        toast.success('Solicitação enviada! O Admin vai liberar suas moedas em breve.');
+        setPacoteSelecionado(null);
+      } else {
+        toast.error('Erro ao enviar solicitação.');
+      }
+    } catch (error) {
+      toast.error('Erro de conexão com o servidor!');
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 relative">
+      {pacoteSelecionado && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl animate-in zoom-in-95">
+            <div className="text-center mb-6">
+              <QrCode className="w-16 h-16 mx-auto text-purple-600 mb-2" />
+              <h2 className="text-2xl font-bold">Pagamento via PIX</h2>
+              <p className="text-gray-600 mt-2">
+                Pacote <strong>{pacoteSelecionado}</strong><br/>
+                Valor: <strong className="text-green-600">R$ {PACOTES[pacoteSelecionado as keyof typeof PACOTES].valor.toFixed(2)}</strong>
+              </p>
+            </div>
+            
+            <div className="bg-slate-100 p-4 rounded-lg text-center mb-6">
+              <p className="text-sm text-gray-500 mb-1">Chave PIX (Email):</p>
+              <p className="font-mono font-bold text-lg select-all">pagamentos@suarifa.com</p>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <Button 
+                onClick={confirmarPagamento} 
+                disabled={enviando}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+              >
+                {enviando ? 'Enviando...' : 'Já fiz o Pagamento!'}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setPacoteSelecionado(null)}
+                disabled={enviando}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate('/')} className="gap-2">
@@ -40,7 +116,6 @@ export function BuyCoins() {
         </div>
       </header>
 
-      {/* Conteúdo Central */}
       <div className="container mx-auto px-4 py-12 max-w-6xl">
         <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
@@ -51,10 +126,8 @@ export function BuyCoins() {
           </p>
         </div>
 
-        {/* Grid dos 3 Pacotes */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
           
-          {/* PACOTE 1: BRONZE */}
           <Card className="relative overflow-hidden border-2 border-orange-200 hover:border-orange-400 hover:shadow-xl transition-all hover:-translate-y-2 bg-gradient-to-b from-white to-orange-50 h-full flex flex-col">
             <CardHeader className="text-center pb-8 pt-8">
               <div className="mx-auto bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mb-4 border border-orange-200">
@@ -83,7 +156,6 @@ export function BuyCoins() {
             </CardFooter>
           </Card>
 
-          {/* PACOTE 2: PRATA */}
           <Card className="relative overflow-hidden border-2 border-purple-500 shadow-2xl scale-100 md:scale-105 z-10 bg-gradient-to-b from-white to-purple-50 h-full flex flex-col">
             <div className="absolute top-0 inset-x-0 bg-purple-500 text-white text-center py-1 text-sm font-bold uppercase tracking-wider">
               Mais Popular
@@ -115,7 +187,6 @@ export function BuyCoins() {
             </CardFooter>
           </Card>
 
-          {/* PACOTE 3: OURO */}
           <Card className="relative overflow-hidden border-2 border-yellow-300 hover:border-yellow-500 hover:shadow-xl transition-all hover:-translate-y-2 bg-gradient-to-b from-white to-yellow-50 h-full flex flex-col">
             <CardHeader className="text-center pb-8 pt-8">
               <div className="mx-auto bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mb-4 border border-yellow-200">

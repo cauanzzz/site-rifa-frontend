@@ -22,6 +22,7 @@ export function CreateRaffle() {
   const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [temData, setTemData] = useState(false);
+  const [termosCriacaoAceitos, setTermosCriacaoAceitos] = useState(false);
 
   useEffect(() => {
     const usuarioSalvo = localStorage.getItem('usuario');
@@ -270,33 +271,44 @@ export function CreateRaffle() {
               </div>
             </div>
 
-            <p className="text-[10px] text-muted-foreground text-center mb-6 leading-tight italic">
-              Ao criar esta rifa, você declara estar ciente de que este site é apenas uma plataforma de gestão. 
-              Não temos relação com o prêmio ou vínculo direto com a organização da rifa.
-            </p>
+            <div className="flex items-start gap-3 bg-slate-100 p-4 rounded-lg mt-6 mb-4 border border-slate-200">
+             <input
+              type="checkbox"
+              id="termosCriacao"
+              className="mt-1 w-4 h-4 text-purple-600 rounded border-gray-300 cursor-pointer"
+              checked={termosCriacaoAceitos}
+              onChange={(e) => setTermosCriacaoAceitos(e.target.checked)}
+            />    
+            <label htmlFor="termosCriacao" className="text-sm text-gray-700 cursor-pointer select-none">
+            <strong>Termo de Responsabilidade:</strong> Declaro que sou o único responsável pela veracidade desta rifa, pela realização justa do sorteio e pela entrega do prêmio ao ganhador, isentando totalmente a plataforma de qualquer responsabilidade legal ou financeira.
+            </label>
+          </div>
 
-            <div className="flex gap-3">
-              <Button 
-                variant="outline" 
-                onClick={() => setMostrarConfirmacao(false)} 
-                disabled={salvando}
-                className="flex-1"
-              >
-                Cancelar
-              </Button>
-              
-              <Button 
-                onClick={confirmarCriacao} 
-                disabled={salvando}
-                className={`flex-1 text-white font-bold ${
-                  salvando 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700'
-                }`}
-              >
-                {salvando ? 'Salvando...' : 'Confirmar'}
-              </Button>
-            </div>
+        <div className="flex flex-col gap-5 mt-4">        
+          <div className="flex gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => setMostrarConfirmacao(false)} 
+              disabled={salvando}
+              className="flex-1"
+            >
+              Cancelar
+            </Button>
+            
+            <Button 
+              onClick={confirmarCriacao} 
+              disabled={salvando || !termosCriacaoAceitos}
+              className={`flex-1 text-white font-bold transition-all ${
+                salvando || !termosCriacaoAceitos
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700'
+              }`}
+            >
+              {salvando ? 'Salvando...' : 'Confirmar'}
+            </Button>
+          </div>
+  
+</div>
           </div>
         </div>
       )}

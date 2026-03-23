@@ -22,6 +22,7 @@ export function RaffleDetail() {
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
   const [formaPagamento, setFormaPagamento] = useState('PIX');
   const [nomePagador, setNomePagador] = useState('');
+  const [termosAceitos, setTermosAceitos] = useState(false);
 
   useEffect(() => {
     const usuarioSalvo = localStorage.getItem('usuario');
@@ -262,17 +263,32 @@ export function RaffleDetail() {
               <p className="text-xs text-gray-500 mt-1">Sua reserva ficará vinculada à sua conta: {usuarioLogado?.email}</p>
             </div>
 
-            <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-              <p className="text-[11px] text-muted-foreground text-center italic leading-tight">
-                Atenção: Este site não tem relação com o prêmio e vínculo direto com a rifa. 
-                Toda a responsabilidade pela entrega e sorteio é exclusiva do criador.
-              </p>
+            <div className="flex items-start gap-3 bg-yellow-100 p-4 rounded-lg mt-4 border border-slate-200">
+            <input
+              type="checkbox"
+              id="aceitoTermos"
+              className="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 cursor-pointer"
+              checked={termosAceitos}
+              onChange={(e) => setTermosAceitos(e.target.checked)}
+            />
+            <label htmlFor="aceitoTermos" className="text-xs text-gray-600 cursor-pointer select-none">
+            <strong>Atenção:</strong> Este site não tem relação com o prêmio e vínculo direto com a rifa. Toda a responsabilidade pela entrega e sorteio é exclusiva do criador.
+            </label>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPurchaseDialog(false)}>Cancelar</Button>
-            <Button onClick={handlePurchase} className="bg-gradient-to-r from-purple-600 to-blue-600">Confirmar Reserva</Button>
+            <Button variant="outline" onClick={() => setShowPurchaseDialog(false)}>
+              Cancelar
+            </Button>
+
+            <Button 
+              onClick={handlePurchase} 
+              disabled={!termosAceitos}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+              Confirmar Reserva
+              </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

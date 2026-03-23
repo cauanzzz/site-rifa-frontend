@@ -6,6 +6,8 @@ import { MyRaffles } from './pages/MyRaffles';
 import { BuyCoins } from './pages/BuyCoins';
 import { AboutUs } from './pages/AboutUs';
 import { Suporte } from './pages/Suporte';
+import AdminDashboard  from './pages/AdminDashboard';
+import { Pagamento } from './pages/Payment';
 
 export const router = createBrowserRouter([
   {
@@ -37,6 +39,14 @@ export const router = createBrowserRouter([
     Component: Suporte,
   },
   {
+    path: '/admin',
+    Component: AdminDashboard,
+  },
+  {
+    path: '/pagamento/:pacote',
+    Component: Pagamento,
+  }
+  ,{
     path: '*',
     Component: () => (
       <div className="min-h-screen flex items-center justify-center">
