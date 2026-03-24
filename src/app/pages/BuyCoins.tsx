@@ -98,7 +98,7 @@ export function BuyCoins() {
               
               <ul className="space-y-3 text-left text-sm text-gray-600 font-medium">
                 <li className="flex items-center gap-2"><Check className="w-5 h-5 text-purple-500" /> Crie até 10 rifas de 100 números</li>
-                <li className="flex items-center gap-2 text-purple-700 bg-purple-100 rounded-md px-2 py-1 w-fit"><Sparkles className="w-4 h-4" /> Bônus de +10 moedas</li>
+                <li className="flex items-center gap-2 text-purple-700 bg-purple-100 rounded-md px-2 py-1 w-fit"><Sparkles className="w-4 h-4" /> Bônus de +80 moedas</li>
               </ul>
             </CardContent>
             <CardFooter className="pt-4 pb-8">
@@ -125,7 +125,7 @@ export function BuyCoins() {
               
               <ul className="space-y-3 text-left text-sm text-gray-600">
                 <li className="flex items-center gap-2"><Check className="w-5 h-5 text-green-500" /> Rifas gigantes ilimitadas</li>
-                <li className="flex items-center gap-2 text-yellow-700 bg-yellow-100 rounded-md px-2 py-1 w-fit"><Sparkles className="w-4 h-4" /> Bônus de +50 moedas</li>
+                <li className="flex items-center gap-2 text-yellow-700 bg-yellow-100 rounded-md px-2 py-1 w-fit"><Sparkles className="w-4 h-4" /> Bônus de +150 moedas</li>
               </ul>
             </CardContent>
             <CardFooter className="pt-4 pb-8">

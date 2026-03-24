@@ -34,8 +34,24 @@ export function CreateRaffle() {
     }
   }, [navigate]);
 
+  const calcularCustoMoedas = (quantidade: number) => {
+    const tabelaPrecos: { [key: number]: number } = {
+      50: 75,
+      100: 144,
+      150: 207,
+      200: 264,
+      250: 315,
+      300: 360,
+      350: 399,
+      400: 432,
+      450: 459,
+      500: 480
+    };
+    return tabelaPrecos[quantidade] || 0;
+  };
+
   const qtdNumeros = parseInt(totalNumbers) || 0;
-  const custoEmMoedas = Math.ceil(qtdNumeros / 10);
+  const custoEmMoedas = calcularCustoMoedas(qtdNumeros);
   const saldoAtual = usuarioLogado?.moedas || 0;
   const ehAdmin = usuarioLogado?.isAdmin || usuarioLogado?.IsAdmin;
   const saldoInsuficiente = !ehAdmin && (custoEmMoedas > saldoAtual);
@@ -134,7 +150,7 @@ export function CreateRaffle() {
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="text-3xl">Criar Nova Rifa</CardTitle>
-                  <CardDescription>Crie sua rifa. A cada 10 números, você gasta 1 moeda.</CardDescription>
+                  <CardDescription>Crie sua rifa. O custo em moedas varia conforme a quantidade de números.</CardDescription>
                 </div>
                 {usuarioLogado && (
                   <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border border-yellow-300 shadow-sm flex items-center gap-1 px-3 py-1 text-base">
@@ -191,16 +207,16 @@ export function CreateRaffle() {
                     <Label htmlFor="totalNumbers">Quantidade de Números (Máx 500) *</Label>
                     <select id="totalNumbers" value={totalNumbers} onChange={(e) => setTotalNumbers(e.target.value)} required className="flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-600">
                       <option value="" disabled>Selecione uma opção...</option>
-                      <option value="50">50 números</option>
-                      <option value="100">100 números</option>
-                      <option value="150">150 números</option>
-                      <option value="200">200 números</option>
-                      <option value="250">250 números</option>
-                      <option value="300">300 números</option>
-                      <option value="350">350 números</option>
-                      <option value="400">400 números</option>
-                      <option value="450">450 números</option>
-                      <option value="500">500 números (Máximo)</option>
+                      <option value="50">50 números (75 moedas)</option>
+                      <option value="100">100 números (144 moedas)</option>
+                      <option value="150">150 números (207 moedas)</option>
+                      <option value="200">200 números (264 moedas)</option>
+                      <option value="250">250 números (315 moedas)</option>
+                      <option value="300">300 números (360 moedas)</option>
+                      <option value="350">350 números (399 moedas)</option>
+                      <option value="400">400 números (432 moedas)</option>
+                      <option value="450">450 números (459 moedas)</option>
+                      <option value="500">500 números (480 moedas)</option>
                     </select>
                     {qtdNumeros > 0 && (
                       <p className={`text-sm mt-2 font-medium ${saldoInsuficiente ? 'text-red-600' : 'text-green-600'}`}>
