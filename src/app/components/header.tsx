@@ -34,7 +34,7 @@ export function Header() {
 
         const buscarRifas = async () => {
             try {
-                const resposta = await fetch('http://localhost:5267/api/rifa');
+                const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/rifa`);
                 if (resposta.ok) {
                     const dados = await resposta.json();
                     setActiveRaffles(dados); 
@@ -49,7 +49,7 @@ export function Header() {
 
     const fazerLogin = async () => {
         try {
-            const resposta = await fetch('http://localhost:5267/api/auth/login', {
+            const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, senha })
@@ -79,7 +79,7 @@ export function Header() {
 
     const fazerCadastro = async () => {
         try {
-            const resposta = await fetch('http://localhost:5267/api/auth/cadastro', {
+            const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/cadastro`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -90,7 +90,7 @@ export function Header() {
             });
 
             if (resposta.ok) {
-                alert('🎉 Conta criada com sucesso! Você ganhou 50 moedas de brinde. Agora faça o login.');
+                alert('🎉 Conta criada com sucesso! Você ganhou 75 moedas de brinde. Agora faça o login.');
                 setMostrarCadastro(false);
                 setMostrarLogin(true);
             } else {

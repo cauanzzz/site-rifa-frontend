@@ -133,7 +133,7 @@ export function MyRaffles() {
 
   const buscarDados = async () => {
     try {
-      const resposta = await fetch('http://localhost:5267/api/rifa');
+      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/rifa`);
       if (resposta.ok) {
         const dados = await resposta.json();
         setRifas(dados);
@@ -147,7 +147,7 @@ export function MyRaffles() {
 
   const aprovarPagamento = async (rifaId: number, numero: number) => {
     try {
-      const resposta = await fetch('http://localhost:5267/api/rifa/aprovar', {
+      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/rifa/aprovar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ RifaId: rifaId, Numero: numero })
@@ -168,7 +168,7 @@ export function MyRaffles() {
     if (!window.confirm("Tem certeza que deseja cancelar esta reserva? O número voltará a ficar disponível para todos.")) return;
     
     try {
-      const resposta = await fetch('http://localhost:5267/api/rifa/rejeitar', {
+      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/rifa/rejeitar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ RifaId: rifaId, Numero: numero })
@@ -189,7 +189,7 @@ export function MyRaffles() {
     if (!window.confirm("Atenção! Ao sortear, a rifa será encerrada e um ganhador será escolhido entre as cotas aprovadas. Deseja continuar?")) return;
 
     try {
-      const resposta = await fetch(`http://localhost:5267/api/rifa/${rifaId}/sortear`, {
+      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/rifa/${rifaId}/sortear`, {
         method: 'POST'
       });
 

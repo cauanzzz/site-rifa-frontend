@@ -23,12 +23,12 @@ export default function AdminDashboard() {
       return;
     }
 
-    fetch('http://localhost:5267/api/admin/pedidos-moedas')
+    fetch(`${import.meta.env.VITE_API_URL}/api/admin/pedidos-moedas`)
       .then(res => res.json())
       .then(data => setPedidos(data))
       .catch(err => console.error(err));
 
-    fetch('http://localhost:5267/api/suporte')
+    fetch(`${import.meta.env.VITE_API_URL}/api/suporte`)
       .then(res => res.json())
       .then(data => setMensagensSuporte(data))
       .catch(err => console.error(err));
@@ -36,7 +36,7 @@ export default function AdminDashboard() {
 
   const handleAprovar = async (id: number) => {
     try {
-      const res = await fetch(`http://localhost:5267/api/admin/aprovar-pedido/${id}`, { method: 'POST' });
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/aprovar-pedido/${id}`, { method: 'POST' });
       if (res.ok) {
         setPedidos(pedidos.filter(p => p.id !== id));
         toast.success('Moedas liberadas com sucesso!');
@@ -49,7 +49,7 @@ export default function AdminDashboard() {
   const handleRecusar = async (id: number) => {
     if (!window.confirm('Tem certeza que deseja recusar este comprovante?')) return;
     try {
-      const res = await fetch(`http://localhost:5267/api/admin/recusar-pedido/${id}`, { method: 'POST' });
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/recusar-pedido/${id}`, { method: 'POST' });
       if (res.ok) {
         setPedidos(pedidos.filter(p => p.id !== id));
       }
@@ -61,7 +61,7 @@ export default function AdminDashboard() {
   const handleResolverSuporte = async (id: number) => {
     if (!window.confirm('Marcar esta mensagem como resolvida?')) return;
     try {
-      const res = await fetch(`http://localhost:5267/api/suporte/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/suporte/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setMensagensSuporte(mensagensSuporte.filter(m => m.id !== id));
         toast.success('Mensagem resolvida!');
@@ -92,7 +92,7 @@ export default function AdminDashboard() {
               : 'text-gray-500 hover:text-gray-700'
           }`}
         >
-          💰 Aprovações de Moedas
+          💰 Aprovações de moedas
         </button>
         <button
           onClick={() => setAbaAtiva('suporte')}
@@ -102,7 +102,7 @@ export default function AdminDashboard() {
               : 'text-gray-500 hover:text-gray-700'
           }`}
         >
-          📩 Tickets de Suporte
+          📩 Tickets de suporte
           {mensagensSuporte.length > 0 && (
             <span className="absolute -top-1 -right-4 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
               {mensagensSuporte.length}
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 min-h-[400px]">
         {abaAtiva === 'moedas' && (
           <div className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-gray-800">Solicitações de PIX Pendentes</h2>
+            <h2 className="text-xl font-bold text-gray-800">Solicitações de PIX pendentes</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -159,7 +159,7 @@ export default function AdminDashboard() {
 
         {abaAtiva === 'suporte' && (
           <div className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-gray-800">Mensagens de Suporte</h2>
+            <h2 className="text-xl font-bold text-gray-800">Mensagens de suporte</h2>
             <div className="flex flex-col gap-4">
               {mensagensSuporte.length === 0 ? (
                 <div className="p-12 text-center text-slate-500 border-2 border-dashed rounded-lg bg-slate-50">Nenhuma mensagem pendente!</div>
@@ -171,7 +171,7 @@ export default function AdminDashboard() {
                         <span className="font-bold text-gray-800">{msg.email}</span>
                         <p className="text-xs text-gray-500">{new Date(msg.dataEnvio).toLocaleString('pt-BR')}</p>
                       </div>
-                      <button onClick={() => handleResolverSuporte(msg.id)} className="px-4 py-2 bg-purple-100 text-purple-700 rounded-md text-sm font-bold">Marcar como Resolvido</button>
+                      <button onClick={() => handleResolverSuporte(msg.id)} className="px-4 py-2 bg-purple-100 text-purple-700 rounded-md text-sm font-bold">Marcar como resolvido</button>
                     </div>
                     <div className="bg-white p-4 rounded border text-gray-700 whitespace-pre-wrap">{msg.mensagem}</div>
                   </div>

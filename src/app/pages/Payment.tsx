@@ -46,7 +46,7 @@ export function Pagamento() {
     setEnviando(true);
 
     try {
-      const response = await fetch('http://localhost:5267/api/admin/solicitar-moedas', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/solicitar-moedas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

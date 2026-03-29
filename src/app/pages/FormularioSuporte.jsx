@@ -23,7 +23,7 @@ const FormularioSuporte = () => {
 
     try {
 
-      const response = await fetch('http://localhost:5267/api/MensagensSuporte', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/MensagensSuporte`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ const FormularioSuporte = () => {
         </div>
 
         <button type="submit" style={{ padding: '10px 15px', cursor: 'pointer' }}>
-          Enviar Mensagem
+          Enviar mensagem
         </button>
       </form>
       {status && <p style={{ marginTop: '15px', fontWeight: 'bold' }}>{status}</p>}

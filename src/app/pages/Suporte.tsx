@@ -26,7 +26,7 @@ export function Suporte() {
     setEnviando(true);
 
     try {
-      const response = await fetch('http://localhost:5267/api/MensagensSuporte', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/MensagensSuporte`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ export function Suporte() {
       <header className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <Button variant="ghost" onClick={() => navigate('/')} className="gap-2 cursor-pointer">
-            <ArrowLeft className="w-4 h-4" /> Voltar para o Início
+            <ArrowLeft className="w-4 h-4" /> Voltar para o início
           </Button>
         </div>
       </header>
@@ -107,7 +107,7 @@ export function Suporte() {
               <form onSubmit={enviarMensagem} className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <Label htmlFor="nome">Seu Nome</Label>
+                    <Label htmlFor="nome">Seu nome</Label>
                     <Input 
                       id="nome" 
                       placeholder="Ex: João Silva" 
@@ -150,7 +150,7 @@ export function Suporte() {
                 >
                   {enviando ? 'Enviando...' : (
                     <>
-                      <Send className="w-5 h-5" /> Enviar Mensagem
+                      <Send className="w-5 h-5" /> Enviar mensagem
                     </>
                   )}
                 </Button>

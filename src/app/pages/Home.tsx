@@ -28,7 +28,7 @@ export function Home() {
   const carregarTodasAsRifas = async () => {
     setLoading(true);
     try {
-      const resposta = await fetch('http://localhost:5267/api/rifa');
+      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/rifa`);
       
       if (resposta.ok) {
         const dados = await resposta.json();
@@ -60,7 +60,7 @@ export function Home() {
 
     setLoading(true);
     try {
-      const resposta = await fetch(`http://localhost:5267/api/Rifa/buscar-por-criador?nome=${termoBusca}`);
+      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/Rifa/buscar-por-criador?nome=${termoBusca}`);
       
       if (resposta.ok) {
         const dados = await resposta.json();
@@ -79,7 +79,7 @@ export function Home() {
 
   const fazerLogin = async () => {
     try {
-      const resposta = await fetch('http://localhost:5267/api/auth/login', {
+      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha })
@@ -109,7 +109,7 @@ export function Home() {
 
   const fazerCadastro = async () => {
     try {
-      const resposta = await fetch('http://localhost:5267/api/auth/cadastro', {
+      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/cadastro`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -173,7 +173,7 @@ export function Home() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{activeRaffles.length}</p>
-                <p className="text-sm text-gray-600">Rifas Ativas</p>
+                <p className="text-sm text-gray-600">Rifas ativas</p>
               </div>
             </div>
           </div>
@@ -186,7 +186,7 @@ export function Home() {
                 <p className="text-2xl font-bold text-gray-900">
                   {activeRaffles.reduce((sum, r) => sum + (r.quantidadeCotas || 0), 0)}
                 </p>
-                <p className="text-sm text-gray-600">Números Disponíveis</p>
+                <p className="text-sm text-gray-600">Números disponíveis</p>
               </div>
             </div>
           </div>
@@ -289,7 +289,7 @@ export function Home() {
                     <CardFooter>
                       <Link to={`/rifa/${raffle.id}`} className="w-full">
                         <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
-                          Ver Números
+                          Ver números
                         </Button>
                       </Link>
                     </CardFooter>

@@ -34,7 +34,7 @@ export function RaffleDetail() {
 
     const buscarRifa = async () => {
       try {
-        const resposta = await fetch('http://localhost:5267/api/rifa');
+        const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/rifa`);
         if (resposta.ok) {
           const todasRifas = await resposta.json();
           const rifaCerta = todasRifas.find((r: any) => r.id === parseInt(id!));
@@ -54,6 +54,7 @@ export function RaffleDetail() {
 
   const titulo = raffle.titulo || 'Rifa Sem Título';
   const preco = raffle.preço || 0;
+  const descricao = raffle.descricao || 'Sem descrição disponível.';
   const quantidadeTotal = raffle.quantidadeCotas || 1;
   const imagemPadrao = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=500&q=80";
   const imagemReal = raffle.imagem || raffle.Imagem || imagemPadrao;
@@ -86,7 +87,7 @@ export function RaffleDetail() {
     }
 
     try {
-      const resposta = await fetch('http://localhost:5267/api/rifa/comprar', {
+      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/rifa/comprar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -150,7 +151,7 @@ export function RaffleDetail() {
               </div>
               <CardHeader>
                 <CardTitle className="text-3xl mb-2">{titulo}</CardTitle>
-                <CardDescription className="text-base">Concorra a este prêmio incrível e ajude a nossa causa!</CardDescription>
+                <CardDescription className="text-base">{descricao}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -185,7 +186,7 @@ export function RaffleDetail() {
           <div className="lg:col-span-1">
             <Card className="sticky top-24">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2"><ShoppingCart className="w-5 h-5" /> Seu Carrinho</CardTitle>
+                <CardTitle className="flex items-center gap-2"><ShoppingCart className="w-5 h-5" /> Seu carrinho</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -199,7 +200,7 @@ export function RaffleDetail() {
                 {isEncerrada ? (
                   <div className="border-t pt-6 mt-4">
                     <Button disabled className="w-full py-6 text-lg bg-slate-200 text-slate-500 cursor-not-allowed">
-                      Vendas Encerradas
+                      Vendas encerradas
                     </Button>
                   </div>
                 ) : selectedNumbers.length > 0 ? (
@@ -214,7 +215,7 @@ export function RaffleDetail() {
                       className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
                       onClick={abrirModalDeCompra}
                     >
-                      Reservar Números
+                      Reservar números
                     </Button>
                   </>
                 ) : (
@@ -285,13 +286,13 @@ export function RaffleDetail() {
       <Dialog open={showPurchaseDialog} onOpenChange={setShowPurchaseDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Finalizar Reserva</DialogTitle>
+            <DialogTitle>Finalizar reserva</DialogTitle>
             <DialogDescription>A compra será confirmada após o pagamento.</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Forma de Pagamento</Label>
+              <Label>Forma de pagamento</Label>
               <select 
                 className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-purple-600"
                 value={formaPagamento} onChange={(e) => setFormaPagamento(e.target.value)}
@@ -334,7 +335,7 @@ export function RaffleDetail() {
               disabled={!termosAceitos}
               className="bg-gradient-to-r from-purple-600 to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-              Confirmar Reserva
+              Confirmar reserva
               </Button>
           </DialogFooter>
         </DialogContent>

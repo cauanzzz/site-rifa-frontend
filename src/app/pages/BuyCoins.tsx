@@ -42,7 +42,7 @@ export function BuyCoins() {
       <div className="container mx-auto px-4 py-12 max-w-6xl">
         <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Recarregue suas Moedas
+            Recarregue suas moedas
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Escolha o pacote ideal para você e comece a criar suas próprias rifas hoje mesmo.
@@ -67,12 +67,12 @@ export function BuyCoins() {
               <p className="text-3xl font-bold text-orange-600 mb-8">R$ 20,25</p>
               
               <ul className="space-y-3 text-left text-sm text-gray-600">
-                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-green-500" /> Crie até 5 rifas de 100 números</li>
+                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-green-500" /> Crie até 2 rifas de 50 números</li>
                 <li className="flex items-center gap-2"><Check className="w-5 h-5 text-green-500" /> Suporte padrão</li>
               </ul>
             </CardContent>
             <CardFooter className="pt-4 pb-8">
-              <Button onClick={() => handleComprar('Iniciante')} className="w-full bg-orange-500 hover:bg-orange-600 text-white text-lg py-6">
+              <Button onClick={() => handleComprar('Iniciante')} className="cursor-pointer w-full bg-orange-500 hover:bg-orange-600 text-white text-lg py-6">
                 Comprar Iniciante
               </Button>
             </CardFooter>
@@ -87,7 +87,7 @@ export function BuyCoins() {
                 <Star className="w-8 h-8 text-purple-600 fill-purple-600" />
               </div>
               <CardTitle className="text-2xl text-purple-800">Popular</CardTitle>
-              <CardDescription>O melhor custo-benefício</CardDescription>
+              <CardDescription>Ideal para criadores intermediários</CardDescription>
             </CardHeader>
             <CardContent className="text-center flex-grow">
               <div className="flex items-end justify-center gap-1 mb-6">
@@ -97,12 +97,12 @@ export function BuyCoins() {
               <p className="text-3xl font-bold text-purple-600 mb-8">R$ 36,54</p>
               
               <ul className="space-y-3 text-left text-sm text-gray-600 font-medium">
-                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-purple-500" /> Crie até 10 rifas de 100 números</li>
+                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-purple-500" /> O mais vendido</li>
                 <li className="flex items-center gap-2 text-purple-700 bg-purple-100 rounded-md px-2 py-1 w-fit"><Sparkles className="w-4 h-4" /> Bônus de +80 moedas</li>
               </ul>
             </CardContent>
             <CardFooter className="pt-4 pb-8">
-              <Button onClick={() => handleComprar('Popular')} className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 text-white text-lg py-6 shadow-lg">
+              <Button onClick={() => handleComprar('Popular')} className="cursor-pointer w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 text-white text-lg py-6 shadow-lg">
                 Comprar Popular
               </Button>
             </CardFooter>
@@ -124,12 +124,12 @@ export function BuyCoins() {
               <p className="text-3xl font-bold text-yellow-600 mb-8">R$ 47,50</p>
               
               <ul className="space-y-3 text-left text-sm text-gray-600">
-                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-green-500" /> Rifas gigantes ilimitadas</li>
+                <li className="flex items-center gap-2"><Check className="w-5 h-5 text-green-500" /> Melhor custo-benefício</li>
                 <li className="flex items-center gap-2 text-yellow-700 bg-yellow-100 rounded-md px-2 py-1 w-fit"><Sparkles className="w-4 h-4" /> Bônus de +150 moedas</li>
               </ul>
             </CardContent>
             <CardFooter className="pt-4 pb-8">
-              <Button onClick={() => handleComprar('Profissional')} className="w-full bg-yellow-500 hover:bg-yellow-600 text-white text-lg py-6">
+              <Button onClick={() => handleComprar('Profissional')} className="cursor-pointer w-full bg-yellow-500 hover:bg-yellow-600 text-white text-lg py-6">
                 Comprar Profissional
               </Button>
             </CardFooter>
