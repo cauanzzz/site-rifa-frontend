@@ -318,7 +318,7 @@ export function Home() {
               ✕
             </button>
             <h2 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Entrar no RIFEX
+              Entrar no RifaCoins
             </h2>
             <div className="space-y-4">
               <div>

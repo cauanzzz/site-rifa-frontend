@@ -46,7 +46,7 @@ export function AboutUs() {
             A nova era das rifas digitais
           </h1>
           <p className="text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-            O RIFEX nasceu para transformar o mercado de sorteios. Unimos a emoção das rifas tradicionais com a segurança e a transparência da tecnologia moderna, criando um ecossistema confiável para criadores e participantes.
+            O RifaCoins nasceu para transformar o mercado de sorteios. Unimos a emoção das rifas tradicionais com a segurança e a transparência da tecnologia moderna, criando um ecossistema confiável para criadores e participantes.
           </p>
         </div>
 
@@ -109,7 +109,7 @@ export function AboutUs() {
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-3 text-gray-950">Transparência na prática</h2>
             <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-              No RIFEX, a sorte é sagrada. Utilizamos a <strong>Web Crypto API</strong>, uma tecnologia de criptografia nativa do navegador que gera números baseados em entropia de hardware. Isso garante um resultado <strong>100% aleatório, imparcial e auditável</strong>. Faça o teste você mesmo:
+              No RifaCoins, a sorte é sagrada. Utilizamos a <strong>Web Crypto API</strong>, uma tecnologia de criptografia nativa do navegador que gera números baseados em entropia de hardware. Isso garante um resultado <strong>100% aleatório, imparcial e auditável</strong>. Faça o teste você mesmo:
             </p>
 
             <div className="relative w-56 h-56 mx-auto mb-10 group">

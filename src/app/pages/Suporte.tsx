@@ -86,8 +86,8 @@ export function Suporte() {
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">E-mail</h3>
                   <p className="text-sm  text-gray-500 mb-2">Respondemos em até 24h</p>
-                  <a href="mailto:suporte@rifex.com" className="text-purple-600 font-medium hover:underline text-sm">
-                    suporte@rifex.com
+                  <a href="mailto:suporte@rifacoins.com" className="text-purple-600 font-medium hover:underline text-sm">
+                    Rrifacoins@gmail.com
                   </a>
                 </div>
               </CardContent>

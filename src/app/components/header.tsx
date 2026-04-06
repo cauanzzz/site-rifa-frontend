@@ -124,7 +124,7 @@ export function Header() {
                                 </div>
                                 <div>
                                     <Link to="/" className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                                        RIFEX
+                                        RifaCoins
                                     </Link>
                                     <p className="text-sm text-gray-600 hidden md:block">Concorra a prêmios incríveis</p>
                                 </div>
@@ -283,7 +283,7 @@ export function Header() {
                             ✕
                         </button>
                         <h2 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                            Entrar no RIFEX
+                            Entrar no RifaCoins
                         </h2>
                         <div className="space-y-4">
                             <div>

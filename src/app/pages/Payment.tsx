@@ -120,7 +120,7 @@ export function Pagamento() {
               <p className="text-sm text-slate-500 mb-2">Escaneie o QR Code ou use a chave PIX abaixo:</p>
               <div className="bg-slate-100 p-3 rounded-lg flex items-center justify-center">
                 <span className="font-mono font-bold text-slate-700 select-all tracking-wider">
-                  pagamentos@suarifa.com
+                  Rrifacoins@gmail.com
                 </span>
               </div>
             </div>
