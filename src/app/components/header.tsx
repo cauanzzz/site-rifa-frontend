@@ -37,8 +37,10 @@ export function Header() {
                 const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/rifa`);
                 if (resposta.ok) {
                     const dados = await resposta.json();
-                    setActiveRaffles(dados); 
-                }
+                    const rifasFiltradas = dados.filter((rifa: any) => rifa.status === "Ativa"); 
+    
+                    setActiveRaffles(rifasFiltradas);
+            }
             } catch (erro) {
                 console.error(erro);
             }
