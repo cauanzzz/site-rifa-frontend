@@ -172,7 +172,7 @@ export function Home() {
                 <TrendingUp className="w-6 h-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{activeRaffles.length}</p>
+                <p className="text-2xl font-bold text-gray-900">{activeRaffles.filter(r => r.status !== 'Encerrada' && r.Status !== 'Encerrada').length}</p>
                 <p className="text-sm text-gray-600">Rifas ativas</p>
               </div>
             </div>
