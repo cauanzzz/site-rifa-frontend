@@ -21,6 +21,7 @@ export function Header() {
     const [nomeCadastro, setNomeCadastro] = useState('');
     const [emailCadastro, setEmailCadastro] = useState('');
     const [senhaCadastro, setSenhaCadastro] = useState('');
+    const [confirmarSenhaCadastro, setConfirmarSenhaCadastro] = useState('');
     
     useEffect(() => {
         const usuarioSalvo = localStorage.getItem('usuario');
@@ -38,9 +39,8 @@ export function Header() {
                 if (resposta.ok) {
                     const dados = await resposta.json();
                     const rifasFiltradas = dados.filter((rifa: any) => rifa.status === "Ativa"); 
-    
                     setActiveRaffles(rifasFiltradas);
-            }
+                }
             } catch (erro) {
                 console.error(erro);
             }
@@ -80,6 +80,11 @@ export function Header() {
     };
 
     const fazerCadastro = async () => {
+        if (senhaCadastro !== confirmarSenhaCadastro) {
+            alert('❌ As senhas não coincidem!');
+            return;
+        }
+
         try {
             const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/cadastro`, {
                 method: 'POST',
@@ -95,6 +100,10 @@ export function Header() {
                 alert('🎉 Conta criada com sucesso! Você ganhou 75 moedas de brinde. Agora faça o login.');
                 setMostrarCadastro(false);
                 setMostrarLogin(true);
+                setNomeCadastro('');
+                setEmailCadastro('');
+                setSenhaCadastro('');
+                setConfirmarSenhaCadastro('');
             } else {
                 const erro = await resposta.text();
                 alert(`❌ Erro: ${erro}`);
@@ -350,6 +359,14 @@ export function Header() {
                                     type="password" placeholder="••••••••"
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 outline-none"
                                     value={senhaCadastro} onChange={(e) => setSenhaCadastro(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Confirmar Senha</label>
+                                <input 
+                                    type="password" placeholder="••••••••"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 outline-none"
+                                    value={confirmarSenhaCadastro} onChange={(e) => setConfirmarSenhaCadastro(e.target.value)}
                                 />
                             </div>
                             <Button 

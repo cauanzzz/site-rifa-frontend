@@ -8,11 +8,12 @@ import { AboutUs } from './pages/AboutUs';
 import { Suporte } from './pages/Suporte';
 import AdminDashboard  from './pages/AdminDashboard';
 import { Pagamento } from './pages/Payment';
+import Telainicial from './pages/TelaInicial';
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    Component: Home,
+    Component: Telainicial,
   },
   {
     path: '/rifa/:id',
@@ -41,6 +42,10 @@ export const router = createBrowserRouter([
   {
     path: '/admin',
     Component: AdminDashboard,
+  },
+  {
+    path: '/rifas-ativas',
+    Component: Home,
   },
   {
     path: '/pagamento/:pacote',

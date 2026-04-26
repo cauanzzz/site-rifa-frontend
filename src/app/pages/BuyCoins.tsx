@@ -13,13 +13,14 @@ export function BuyCoins() {
     const usuarioSalvo = localStorage.getItem('usuario');
     if (usuarioSalvo) {
       setUsuarioLogado(JSON.parse(usuarioSalvo));
-    } else {
-      toast.error('Você precisa estar logado para comprar moedas!');
-      navigate('/');
     }
-  }, [navigate]);
+  }, []);
 
   const handleComprar = (pacote: string) => {
+    if (!usuarioLogado) {
+      toast.error('Faça login ou cadastre-se para comprar moedas!');
+      return;
+    }
     navigate(`/pagamento/${pacote}`);
   };
 
