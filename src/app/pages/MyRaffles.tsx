@@ -133,7 +133,7 @@ export function MyRaffles() {
 
   const buscarDados = async () => {
     try {
-      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/rifa`);
+      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/api/rifa/todas`);
       if (resposta.ok) {
         const dados = await resposta.json();
         setRifas(dados);
